@@ -63,14 +63,8 @@ function increaseDegree(originalControlPoints)
 	n = length(originalControlPoints[:,1])
 	
 	for i=1:n+1
-#		if i == 1
-#			increasing[1,:] = sandbox[2,:] 
-#		elseif i == n+1
-#			increasing[n+1,:] = sandbox[n+1,:] 
-#		else
-			ratio = (i-1)/(n)
-			increasing[i,:] = ratio*sandbox[i,:] + (1 - ratio)*sandbox[i+1,:] 
-#		end
+		ratio = (i-1)/(n)
+		increasing[i,:] = ratio*sandbox[i,:] + (1 - ratio)*sandbox[i+1,:] 
 	end
 
 	increasing
@@ -123,5 +117,13 @@ function exercise_six()
 	writeArrayForGnuplot(oneMoreDegreeControlPoints, "control-poly-exercise-six-one-more-degree.coordinates")
 	writeArrayForGnuplot(oneMoreDegreeBezierCurvePoints, "bezier-one-more-degree-exercise-six.coordinates")
 
+	twoMoreDegreeControlPoints = increaseDegree(oneMoreDegreeControlPoints)
+	twoMoreDegreeBezierCurvePoints = drawCurve(twoMoreDegreeControlPoints, linspace(0,1,200))
+	writeArrayForGnuplot(twoMoreDegreeControlPoints, "control-poly-exercise-six-two-more-degree.coordinates")
+	writeArrayForGnuplot(twoMoreDegreeBezierCurvePoints, "bezier-two-more-degree-exercise-six.coordinates")
 
+	threeMoreDegreeControlPoints = increaseDegree(twoMoreDegreeControlPoints)
+	threeMoreDegreeBezierCurvePoints = drawCurve(threeMoreDegreeControlPoints, linspace(0,1,200))
+	writeArrayForGnuplot(threeMoreDegreeControlPoints, "control-poly-exercise-six-three-more-degree.coordinates")
+	writeArrayForGnuplot(threeMoreDegreeBezierCurvePoints, "bezier-three-more-degree-exercise-six.coordinates")
 end

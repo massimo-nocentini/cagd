@@ -17,9 +17,18 @@ plot [-0.5:6.5] [-0.3:5] "control-poly-exercise-four.coordinates" with linespoin
 set output 'exercise-six-original.eps'
 plot "bezier-original-exercise-six.coordinates" with lines, "control-poly-exercise-six.coordinates" with linespoints pt 6
 
-
 set output 'exercise-six-one-more-degree.eps'
 plot "bezier-one-more-degree-exercise-six.coordinates" with lines, "control-poly-exercise-six-one-more-degree.coordinates" with linespoints pt 6
 
 set output 'exercise-six-one-more-degree-comparison.eps'
-plot "bezier-one-more-degree-exercise-six.coordinates" with lines, "bezier-original-exercise-six.coordinates" with lines
+plot [0:11] [0:7] "bezier-one-more-degree-exercise-six.coordinates" with lines, \
+	"bezier-two-more-degree-exercise-six.coordinates" with lines, \
+	"bezier-three-more-degree-exercise-six.coordinates" with lines, \
+	"bezier-original-exercise-six.coordinates" with lines
+
+set output 'exercise-six-higher-degree-control-poly.eps'
+plot [0:11] [0:7] "control-poly-exercise-six.coordinates" with lines, \
+	"control-poly-exercise-six-one-more-degree.coordinates" with lines, \
+	"control-poly-exercise-six-two-more-degree.coordinates" with lines, \
+	"control-poly-exercise-six-three-more-degree.coordinates" with lines, \
+	"bezier-original-exercise-six.coordinates" with lines
