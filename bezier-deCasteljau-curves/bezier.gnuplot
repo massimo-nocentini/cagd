@@ -32,3 +32,8 @@ plot [0:11] [0:7] "control-poly-exercise-six.coordinates" with lines, \
 	"control-poly-exercise-six-two-more-degree.coordinates" with lines, \
 	"control-poly-exercise-six-three-more-degree.coordinates" with lines, \
 	"bezier-original-exercise-six.coordinates" with lines
+
+set output 'exercise-five.eps'
+plot "bezier-original-exercise-five.coordinates" with lines, \
+	"bezier-repeated-exercise-five.coordinates" with lines
+

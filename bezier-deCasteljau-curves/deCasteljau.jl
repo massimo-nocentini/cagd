@@ -1,7 +1,7 @@
 function drawCurve(aMatrix, aParameterVector)
 	
 	n = length(aParameterVector)
-	x = zeros(n, 2)
+	x = zeros(n, length(aMatrix[1,:]))
 	for i = 1:n
 		param = aParameterVector[i]
 		aPoint, Diagonal, Last = decasteljau(aMatrix, param)
@@ -126,4 +126,16 @@ function exercise_six()
 	threeMoreDegreeBezierCurvePoints = drawCurve(threeMoreDegreeControlPoints, linspace(0,1,200))
 	writeArrayForGnuplot(threeMoreDegreeControlPoints, "control-poly-exercise-six-three-more-degree.coordinates")
 	writeArrayForGnuplot(threeMoreDegreeBezierCurvePoints, "bezier-three-more-degree-exercise-six.coordinates")
+end
+
+function exercise_five()
+	PointToRepeat = Float64[10 1]
+	originalControlPoints = [ [2.0 4]; [6 12]; PointToRepeat; [12 12] ]
+
+	repeatedControlPoints = [ [2.0 4]; [6 12]; PointToRepeat; PointToRepeat; PointToRepeat; PointToRepeat; [12 12] ]
+
+	originalBezierCurvePoints = drawCurve(originalControlPoints, linspace(0,1,200))
+	repeatedBezierCurvePoints = drawCurve(repeatedControlPoints, linspace(0,1,200))
+	writeArrayForGnuplot(originalBezierCurvePoints, "bezier-original-exercise-five.coordinates")
+	writeArrayForGnuplot(repeatedBezierCurvePoints, "bezier-repeated-exercise-five.coordinates")
 end
