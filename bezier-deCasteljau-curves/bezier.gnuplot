@@ -40,3 +40,24 @@ set output 'exercise-five.eps'
 plot "bezier-original-exercise-five.coordinates" with lines, \
 	"bezier-repeated-exercise-five.coordinates" with lines
 
+set output 'exercise-seven-continuity.eps'
+plot [-0.5:25] [-10.5:4] "control-poly-base-exercise-seven-exercise-seven.coordinates" with linespoints pt 6, \
+	"control-poly-continuity-exercise-seven.coordinates" with linespoints pt 6, \
+	"bezier-base-exercise-seven.coordinates" with lines, \
+	"bezier-continuity-exercise-seven.coordinates" with lines
+
+set output 'exercise-seven-tangent.eps'
+plot [-0.5:25] [-10.5:4] "control-poly-base-exercise-seven-exercise-seven.coordinates" with linespoints pt 6, \
+	"control-poly-tangent-exercise-seven.coordinates" with linespoints pt 6, \
+	"bezier-base-exercise-seven.coordinates" with lines, \
+	"bezier-tangent-exercise-seven.coordinates" with lines
+
+set output 'exercise-seven-obsculating.eps'
+plot [-0.5:25] [-10.5:4] "control-poly-base-exercise-seven-exercise-seven.coordinates" with linespoints pt 6, \
+	"control-poly-obsculating-exercise-seven.coordinates" with linespoints pt 6, \
+	"bezier-base-exercise-seven.coordinates" with lines, \
+	"bezier-obsculating-exercise-seven.coordinates" with lines
+
+set output 'exercise-seven-a_succ_i.eps'
+plot [-0.5:25] [-10.5:4] "control-poly-base-obsculating-exercise-seven.coordinates" with linespoints pt 6, \
+	"control-poly-base-obsculating-with-a-succ-i-exercise-seven.coordinates" with linespoints pt 6
