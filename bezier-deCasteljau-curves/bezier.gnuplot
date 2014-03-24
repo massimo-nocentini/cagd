@@ -59,5 +59,5 @@ plot [-0.5:25] [-10.5:4] "control-poly-base-exercise-seven-exercise-seven.coordi
 	"bezier-obsculating-exercise-seven.coordinates" with lines
 
 set output 'exercise-seven-a_succ_i.eps'
-plot [-0.5:25] [-10.5:4] "control-poly-base-obsculating-exercise-seven.coordinates" with linespoints pt 6, \
+plot "control-poly-base-obsculating-exercise-seven.coordinates" with linespoints pt 6, \
 	"control-poly-base-obsculating-with-a-succ-i-exercise-seven.coordinates" with linespoints pt 6

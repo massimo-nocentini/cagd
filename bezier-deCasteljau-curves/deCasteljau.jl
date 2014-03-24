@@ -225,7 +225,7 @@ function exercise_seven()
 	             ]
 
     continuityPoint, tangentPoint, obsculatorPoint, a_succ_i =
-        junction(controlPoints, 1, 1)
+        junction(controlPoints, 1, 2)
 
     restControlPoints = [
                          [15.0 3 0];
