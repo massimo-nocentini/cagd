@@ -16,15 +16,25 @@ function writeArrayForGnuplot(anArray, aFilename)
 	anArray
 end
 
-function parametricCoordinates(xFn, yFn, pointsNumber)
+function parametricCoordinates(functionsVector, pointsNumber)
 
 	parameterVector = linspace(0, 1, pointsNumber)	
 
-	coordinates = zeros(pointsNumber, 2)
+	numberOfCoordinates = length(functionsVector)
+
+	coordinates = zeros(pointsNumber, numberOfCoordinates)
 
 	for i = 1:pointsNumber
 		t = parameterVector[i]
-		coordinates[i,:] = [xFn(t) yFn(t)]		
+
+		coord = zeros(numberOfCoordinates)'
+
+		for j = 1:numberOfCoordinates
+			func = functionsVector[j]
+			coord[j] = func(t)
+		end
+
+		coordinates[i,:] = coord
 	end
 
 	coordinates
@@ -58,8 +68,18 @@ function decasteljau(controlPointsMatrix, t)
 end
 
 function increaseDegree(originalControlPoints)
-	sandbox = [ [0 0]; copy(originalControlPoints); [0 0] ]
-	increasing = [copy(originalControlPoints); [0 0] ]
+	columns = length(originalControlPoints[1,:])
+	sandbox = [
+		zeros(columns)'; 
+		copy(originalControlPoints); 
+		zeros(columns)'; 
+	]
+	
+	increasing = [
+		copy(originalControlPoints); 
+		zeros(columns)' 
+	]
+	
 	n = length(originalControlPoints[:,1])
 	
 	for i=1:n+1
@@ -84,13 +104,30 @@ function exercise_one ()
 end
 
 function exercise_two ()
-	controlPoints = parametricCoordinates(x -> 1 + x + x^2, y -> y^3, 6)
+	controlPoints = parametricCoordinates(
+		[
+			x -> 1 + x + x^2;
+			y -> y^3
+		], 6)
 
 	bezierCurvePoints = drawCurve(controlPoints,
 					linspace(0,1,200))
 
 	writeArrayForGnuplot(bezierCurvePoints, "bezier-exercise-two.coordinates")
 	writeArrayForGnuplot(controlPoints, "control-poly-exercise-two.coordinates")
+
+	controlPoints = parametricCoordinates(
+		[
+			x -> 1 + x + x^2;
+			y -> y^3;
+			z -> z^2 - pi/2
+		], 6)
+
+	bezierCurvePoints = drawCurve(controlPoints,
+					linspace(0,1,200))
+
+	writeArrayForGnuplot(bezierCurvePoints, "bezier-three-axes-exercise-two.coordinates")
+	writeArrayForGnuplot(controlPoints, "control-three-axes-poly-exercise-two.coordinates")
 end
 
 function exercise_four ()
@@ -130,9 +167,23 @@ end
 
 function exercise_five()
 	PointToRepeat = Float64[10 1]
-	originalControlPoints = [ [2.0 4]; [6 12]; PointToRepeat; [12 12] ]
 
-	repeatedControlPoints = [ [2.0 4]; [6 12]; PointToRepeat; PointToRepeat; PointToRepeat; PointToRepeat; [12 12] ]
+	originalControlPoints = [ 	
+		[2.0 4]; 
+		[6 12]; 
+		PointToRepeat; 
+		[12 12] 
+	]
+
+	repeatedControlPoints = [ 
+		[2.0 4]; 
+		[6 12]; 
+		PointToRepeat; 
+		PointToRepeat; 
+		PointToRepeat; 
+		PointToRepeat; 
+		[12 12] 
+	]
 
 	originalBezierCurvePoints = drawCurve(originalControlPoints, linspace(0,1,200))
 	repeatedBezierCurvePoints = drawCurve(repeatedControlPoints, linspace(0,1,200))

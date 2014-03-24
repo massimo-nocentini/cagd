@@ -6,6 +6,9 @@ plot [0:12] [0:10] "bezier-exercise-one.coordinates" with lines, "simple-control
 set output 'exercise-two.eps'
 plot [0.5:3.5] [-0.3:1.3] "bezier-exercise-two.coordinates" with lines, "control-poly-exercise-two.coordinates" with linespoints pt 6
 
+set output 'exercise-two-three-axes.eps'
+splot  "bezier-three-axes-exercise-two.coordinates" with lines, "control-three-axes-poly-exercise-two.coordinates" with linespoints pt 6
+
 set output 'exercise-four.eps'
 plot [-0.5:6.5] [-0.3:5] "control-poly-exercise-four.coordinates" with linespoints pt 6, \
 	"cyan-control-poly-exercise-four.coordinates" with linespoints pt 6, \
