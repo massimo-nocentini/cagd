@@ -164,12 +164,15 @@ function derivative(differencePoints, param)
     value * (n+1)
 end
 
-function readSimplePolygon()
-    readdlm("simple-control-polygon.dat")
-end
-
 function exercise_one ()
-    controlPoints = readSimplePolygon()
+    controlPoints = [
+                     [1.0 1 0];
+                     [3.0 4 2];
+                     [5.0 6 1];
+                     [7.0 8 9];
+                     [10.0 2 8];
+                     [1.0 1 0];
+                     ]
     
     bezierCurvePoints = drawCurve(controlPoints,
 				  linspace(0,1,200))
@@ -203,7 +206,15 @@ function exercise_two ()
 end
 
 function exercise_four ()
-    outerControlPoints = readdlm("control-poly-exercise-four.coordinates")
+    outerControlPoints = [
+                          [0.0 0];
+                          [1.0 3];
+                          [2.5 4];
+                          [5 4.5];
+                          [4.5 2.5];
+                          [6.0 1];
+                          ]
+    writeArrayForGnuplot(outerControlPoints, "control-poly-exercise-four.coordinates")
     t_star = .25
     q_value, Diagonal, Last = decasteljau(outerControlPoints, t_star)
     writeArrayForGnuplot(Diagonal, "cyan-control-poly-exercise-four.coordinates")
@@ -217,7 +228,14 @@ function exercise_four ()
 end
 
 function exercise_six()
-    originalControlPoints = readdlm("control-poly-exercise-six.coordinates")
+    originalControlPoints = [
+                             [1.0 1];
+                             [3.0 4];
+                             [5.0 6];
+                             [7.0 1.5];
+                             [10 2]
+                             ]
+    writeArrayForGnuplot(originalControlPoints, "control-poly-exercise-six.coordinates")
     originalBezierCurvePoints = drawCurve(originalControlPoints, linspace(0,1,200))
     writeArrayForGnuplot(originalBezierCurvePoints, "bezier-original-exercise-six.coordinates")
 
