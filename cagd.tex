@@ -12,6 +12,7 @@
 \newtheorem{teorema}{Teorema}  
 \newtheorem{proprieta}{Proprietà}  
 \usepackage{titletoc}
+\usepackage{verbatim}
 
 \titlecontents{section}[3em]{}{\contentslabel{1em}}{}{\titlerule*[1.5pc]{.}\contentspage}
 \titlecontents{subsection}[6em]{}{\contentslabel{2em}}{}{\titlerule*[1.5pc]{.}\contentspage}
@@ -64,6 +65,9 @@
 \includegraphics{bezier-deCasteljau-curves/exercise-seven-tangent-left}
 \includegraphics{bezier-deCasteljau-curves/exercise-seven-obsculating-left}
 \includegraphics{bezier-deCasteljau-curves/exercise-seven-a_i-left}
+
+\section{Code}
+\verbatiminput{bezier-deCasteljau-curves/deCasteljau.jl}
 
 \newpage
 
