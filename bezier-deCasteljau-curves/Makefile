@@ -4,6 +4,7 @@ all: drawings
 
 drawings:
 	$(JULIA) --eval "include(\"deCasteljau.jl\"); \
+		include(\"exercises.jl\"); \
 		exercise_one(); \
 		exercise_two(); \
 		exercise_four(); \
