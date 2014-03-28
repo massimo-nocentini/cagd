@@ -1,0 +1,9 @@
+*swp
+*.eps
+*.coordinates
+*.pdf
+*.aux
+*.toc
+*.log
+*~
+*.out
