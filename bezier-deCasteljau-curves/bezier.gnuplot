@@ -61,3 +61,25 @@ plot [-0.5:25] [-10.5:4] "control-poly-base-exercise-seven-exercise-seven.coordi
 set output 'exercise-seven-a_succ_i.eps'
 plot "control-poly-base-obsculating-exercise-seven.coordinates" with linespoints pt 6, \
 	"control-poly-base-obsculating-with-a-succ-i-exercise-seven.coordinates" with linespoints pt 6
+
+set output 'exercise-seven-continuity-left.eps'
+plot [-0.5:25] [-5:20] "control-poly-base-left-exercise-seven-exercise-seven.coordinates" with linespoints pt 6, \
+	"control-poly-continuity-left-exercise-seven.coordinates" with linespoints pt 6, \
+	"bezier-base-left-exercise-seven.coordinates" with lines, \
+	"bezier-continuity-left-exercise-seven.coordinates" with lines
+
+set output 'exercise-seven-tangent-left.eps'
+plot [-0.5:25] [-5:20] "control-poly-base-left-exercise-seven-exercise-seven.coordinates" with linespoints pt 6, \
+	"control-poly-tangent-left-exercise-seven.coordinates" with linespoints pt 6, \
+	"bezier-base-left-exercise-seven.coordinates" with lines, \
+	"bezier-tangent-left-exercise-seven.coordinates" with lines
+
+set output 'exercise-seven-obsculating-left.eps'
+plot [-0.5:25] [-5:20] "control-poly-base-left-exercise-seven-exercise-seven.coordinates" with linespoints pt 6, \
+	"control-poly-obsculating-left-exercise-seven.coordinates" with linespoints pt 6, \
+	"bezier-base-left-exercise-seven.coordinates" with lines, \
+	"bezier-obsculating-left-exercise-seven.coordinates" with lines
+
+set output 'exercise-seven-a_i-left.eps'
+plot "control-poly-base-obsculating-left-exercise-seven.coordinates" with linespoints pt 6, \
+	"control-poly-base-obsculating-with-a-i-left-exercise-seven.coordinates" with linespoints pt 6

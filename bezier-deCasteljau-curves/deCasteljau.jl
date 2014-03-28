@@ -90,7 +90,7 @@ function increaseDegree(originalControlPoints)
     increasing
 end
 
-function junction(controlPoints, h_i, h_succ_i)
+function junction_right(controlPoints, h_i, h_succ_i)
 
     lastControlPoint = controlPoints[end,:]
     lastButOneControlPoint = controlPoints[end - 1,:]
@@ -114,6 +114,54 @@ function junction(controlPoints, h_i, h_succ_i)
     a_succ_i = tangentPoint + (h_i / h_succ_i) * (tangentPoint - obsculatorPoint)
     
     continuityPoint, tangentPoint, obsculatorPoint, a_succ_i
+end
+
+
+function junction_left(controlPoints, h_i, h_succ_i)
+
+    firstControlPoint = controlPoints[1,:]
+    secondControlPoint = controlPoints[2,:]
+    thirdControlPoint = controlPoints[3,:]
+    
+    intervalLengthSum = h_i + h_succ_i
+    
+    # in order to get continuity of degree zero
+    continuityPoint = firstControlPoint
+    
+    # in order to get continuity of degree one
+    tangentPoint = (firstControlPoint - (h_i/ intervalLengthSum)*secondControlPoint) *
+    (intervalLengthSum / h_succ_i)
+
+    # in order to get continuity of degree two
+    obsculatorPoint = tangentPoint *(1 + (h_succ_i / h_i)) - secondControlPoint -
+    (h_i / h_succ_i) * (secondControlPoint - thirdControlPoint)
+
+    obsculatorPoint = (h_i / h_succ_i) * obsculatorPoint
+
+    a_i = tangentPoint + (h_succ_i / h_i) * (tangentPoint - obsculatorPoint)
+    
+    continuityPoint, tangentPoint, obsculatorPoint, a_i
+end
+
+function difference(controlPoints)
+    n = length(controlPoints[:,1])
+    derivativePoints = zeros(n-1, length(controlPoints[1,:]))
+
+    for i=1:n-1
+        derivativePoints[i,:] = controlPoints[i+1,:] - controlPoints[i,:]        
+    end
+
+    derivativePoints
+end
+
+function derivative(differencePoints, param)
+    n = length(differencePoints[:,1])
+    value = zeros(differencePoints[1,:])
+    B = i -> binomial(n, i) * param^i * (1 - param)^(n - i); 
+    for i=1:n
+        value = value + differencePoints[i,:]*B(i)
+    end
+    value * (n+1)
 end
 
 function readSimplePolygon()
@@ -225,7 +273,7 @@ function exercise_seven()
 	             ]
 
     continuityPoint, tangentPoint, obsculatorPoint, a_succ_i =
-        junction(controlPoints, 1, 2)
+        junction_right(controlPoints, 1, 1)
 
     restControlPoints = [
                          [15.0 3 0];
@@ -290,5 +338,113 @@ function exercise_seven()
                           ], 
 		         "control-poly-base-obsculating-with-a-succ-i-exercise-seven.coordinates")
 
+
+end
+
+function exercise_seven_left()
+
+    controlPoints = [
+		     [10.0 12 0];
+		     [13.0 8.5 0];
+		     [16.0 -2 0];
+		     [26.0 0 0];
+	             ]
+
+    continuityPoint, tangentPoint, obsculatorPoint, a_i =
+        junction_left(controlPoints, 1, 1)
+
+    restControlPoints = [
+		         [0.0 3 0];
+		         [1.0 -4 0];
+		         [5.0 0 0];
+	                 ]
+
+    continuityControlPoints = [
+                               restControlPoints;
+                               continuityPoint;
+                               ]
+
+    tangentControlPoints = [
+                            restControlPoints;
+                            tangentPoint;
+                            continuityPoint;
+                            ]
+
+    obsculatingControlPoints = [
+                                restControlPoints;
+                                obsculatorPoint;
+                                tangentPoint;
+                                continuityPoint;
+                                ]
+    
+    baseBezierCurvePoints = drawCurve(controlPoints,
+                                      linspace(0,1,200))
+    continuityBezierCurvePoints = drawCurve(continuityControlPoints,
+                                            linspace(0,1,200))
+    tangentBezierCurvePoints = drawCurve(tangentControlPoints,
+                                         linspace(0,1,200))
+    obsculatingBezierCurvePoints = drawCurve(obsculatingControlPoints,
+                                             linspace(0,1,200))
+
+    writeArrayForGnuplot(controlPoints,
+                         "control-poly-base-left-exercise-seven-exercise-seven.coordinates")
+    writeArrayForGnuplot(continuityControlPoints, 
+		         "control-poly-continuity-left-exercise-seven.coordinates")
+    writeArrayForGnuplot(tangentControlPoints, 
+		         "control-poly-tangent-left-exercise-seven.coordinates")
+    writeArrayForGnuplot(obsculatingControlPoints, 
+		         "control-poly-obsculating-left-exercise-seven.coordinates")
+
+    writeArrayForGnuplot(baseBezierCurvePoints, "bezier-base-left-exercise-seven.coordinates")
+    writeArrayForGnuplot(continuityBezierCurvePoints, "bezier-continuity-left-exercise-seven.coordinates")
+    writeArrayForGnuplot(tangentBezierCurvePoints, "bezier-tangent-left-exercise-seven.coordinates")
+    writeArrayForGnuplot(obsculatingBezierCurvePoints, "bezier-obsculating-left-exercise-seven.coordinates")
+
+    writeArrayForGnuplot([
+                          obsculatingControlPoints;
+                          controlPoints;
+                          ], 
+		         "control-poly-base-obsculating-left-exercise-seven.coordinates")
+
+    writeArrayForGnuplot([
+                          obsculatingControlPoints[end-1,:];
+                          a_i;
+                          controlPoints[2,:];                          
+                          ], 
+		         "control-poly-base-obsculating-with-a-i-left-exercise-seven.coordinates")
+
+
+end
+
+function exercise_derivative()
+    controlPoints = [
+                     [1.0 1 0];
+                     [3.0 4 2];
+                     [5.0 6 1];
+                     [7.0 8 9];
+                     [10.0 2 8];
+                     [1.0 1 0]
+                     ]
+
+    params = 200
+    differencePoints = difference(controlPoints)
+    derivativePoints = zeros(params, 3)
+
+    j = 1
+    for i=linspace(0,1,200)
+        derivativePoints[j,:] = derivative(differencePoints,i)
+        j += 1
+    end
+
+    writeArrayForGnuplot(drawCurve([
+                                    [0.0 0 0];
+                                    differencePoints;
+                                    [0.0 0 0];
+                                    ],
+                                   linspace(0,1,200)),
+		         "differences-of-exercise-one.coordinates")
+    
+    writeArrayForGnuplot(derivativePoints,
+		         "derivative-of-exercise-one.coordinates")
 
 end
