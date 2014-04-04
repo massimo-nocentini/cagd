@@ -11,6 +11,19 @@ function drawCurve(aMatrix, aParameterVector)
     x
 end
 
+function exercise_three()
+    x = t -> 1 + t + t^2
+    y = t -> t^3
+    points = zeros(200, 2)
+    params = linspace(0,1,200)
+    for i=1:200
+        t = params[i]
+        points[i,:] =
+            [x(t) y(t)]
+    end
+    writeArrayForGnuplot(points, "test-exercise-three.coordinates")
+end
+
 function writeArrayForGnuplot(anArray, aFilename)
     writedlm(aFilename, anArray, '\t')
     anArray

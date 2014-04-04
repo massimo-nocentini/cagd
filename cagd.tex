@@ -78,7 +78,6 @@ with $u\in[0,1]$. For plotting we choose to sample 6 control points,
 uniformly spaced in $[0,1]$: observe that there isn't a relation
 between the uniform sampling for the parameter $u$ and control points
 distribution on the plane.
-
 \begin{figure}
   \centering
   \includegraphics{bezier-deCasteljau-curves/exercise-two}
@@ -86,13 +85,71 @@ distribution on the plane.
   \label{fig:curve-from-parametric-spec}
 \end{figure}
 
+\subsection{Splitted curve on a given parameter $u$}
+As required in Exercise 4, in \autoref{fig:splitted-curve} we report
+the control polygon, in red, for the original curve and two sets of
+control points with the same cardinality that, drawn together, build a
+Bezier that is the same as the original one. Those two sets are
+colored in green (the relative Bezier in magenta) and in blue (the
+relative Bezier in cyan), respectively.
+\begin{figure}
+  \centering
+  \includegraphics{bezier-deCasteljau-curves/exercise-four}
+  \caption{Splitted curve}
+  \label{fig:splitted-curve}
+\end{figure}
+
+\subsection{Repeating the same control point more times}
+As required in Exercise 5, in
+\autoref{fig:repeating-same-control-point} we report two Bezier: the
+red one relative to control points $\{(2,4), (6,12), (10,1),
+(12,12)\}$ the green one relative to control points $\{(2,4), (6,12),
+(10,1), (10,1), (10,1), (10,1), (12,12)\}$, ie. with the point
+$(10,1)$ repeated three more times. We see that the Bezier relative to
+the augmented control polygon goes down toward $(10,1)$ more than the
+other Bezier: this can be explained from a probabilistic point of
+view, since a Bezier can be thought as a \emph{mean} of the control
+polygon, hence putting weight in $(10,1)$ increase the control point's
+weight.
+\begin{figure}
+  \centering
+  \includegraphics{bezier-deCasteljau-curves/exercise-five}
+  \caption{Repeating the control point $(10,1)$ three more times}
+  \label{fig:repeating-same-control-point}
+\end{figure}
+
+\subsection{Increasing degree}
+As required in Exercise 6, we start from an original set of control
+points, plotted in \autoref{fig:increasing-degree-original-curve}, and
+we proceed by increasing the degree three times. We obtains three
+augmented set of control points, plotted in
+\autoref{fig:some-increased-degrees}, respectively. It is possible to
+check the slow convergence for the sequence of polygons to the Bezier
+curve and, in \autoref{fig:increasing-degree-does-change-curve}, the
+Bezier curves relative to each augmented polygons doesn't change in
+shape, ie their drawn is the same as the original one (we simply plot
+those Bezier curves in the same plot and each one is over the others).
+\begin{figure}
+  \centering
+  \includegraphics{bezier-deCasteljau-curves/exercise-six-original}
+  \caption{Original curve before increasing degree}
+  \label{fig:increasing-degree-original-curve}
+\end{figure}
+\begin{figure}
+  \centering
+  \includegraphics{bezier-deCasteljau-curves/exercise-six-higher-degree-control-poly}
+  \caption{Some control polygons, each one with one more degree}
+  \label{fig:some-increased-degrees}
+\end{figure}
+\begin{figure}
+  \centering
+  \includegraphics{bezier-deCasteljau-curves/exercise-six-one-more-degree-comparison}
+  \caption{Increasing degree doesn't change the Bezier shape}
+  \label{fig:increasing-degree-does-change-curve}
+\end{figure}
 
 
-\includegraphics{bezier-deCasteljau-curves/exercise-four}
-\includegraphics{bezier-deCasteljau-curves/exercise-five}
-\includegraphics{bezier-deCasteljau-curves/exercise-six-original}
-\includegraphics{bezier-deCasteljau-curves/exercise-six-higher-degree-control-poly}
-\includegraphics{bezier-deCasteljau-curves/exercise-six-one-more-degree-comparison}
+
 \includegraphics{bezier-deCasteljau-curves/exercise-seven-continuity}
 \includegraphics{bezier-deCasteljau-curves/exercise-seven-tangent}
 \includegraphics{bezier-deCasteljau-curves/exercise-seven-obsculating}
