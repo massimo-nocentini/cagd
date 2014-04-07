@@ -22,27 +22,56 @@ function exercise_zero()
                      ]
 
 
-    continuityVector = ones(length(controlPoints[:,1]))
+    ## continuityVector = ones(length(controlPoints[:,1]))
     k = 4
-    hukairs = -3
-    extendedPartition = extendPartition(k,
-                                        [
-                                         [-3 hukairs];
-                                         controlPoints;
-                                         [4 hukairs];
-                                         ],
-                                        continuityVector,
-                                        Clumped())
-
-    M = sum(continuityVector)
-    matrix = buildFunctionsMatrix(k, M, extendedPartition[:,1])
-
+    extendedPartition = extendedPartitionAttempt(k, ones(6), Clumped())
+    M = sum(ones(6))
+    matrix = buildFunctionsMatrix(k, M, extendedPartition)
+    fittingPoints = 200
+    bspline = drawCurve(extendedPartition, k, M, controlPoints, matrix, fittingPoints)
+   
     writeArrayForGnuplot(controlPoints,
                          "exercise-zero-clamped-control-poly.coordinates")
 
-    
-    
-    extendedPartition, matrix
+    writeArrayForGnuplot(bspline,
+                         "exercise-zero-clamped-bspline.coordinates")
+
+    extendedPartition = extendedPartitionAttempt(k, ones(6), Uniformed())
+    M = sum(ones(6))
+    matrix = buildFunctionsMatrix(k, M, extendedPartition)
+    fittingPoints = 200
+    bspline = drawCurve(extendedPartition, k, M, controlPoints, matrix, fittingPoints)
+   
+    writeArrayForGnuplot(controlPoints,
+                         "exercise-zero-uniformed-control-poly.coordinates")
+
+    writeArrayForGnuplot(bspline,
+                         "exercise-zero-uniformed-bspline.coordinates")
+
+end
+
+function drawCurve(extendedPartition, k, M, controlPoints, matrix, fittingPoints)
+    paramRange = linspace(minimum(extendedPartition),
+                          maximum(extendedPartition),
+                          fittingPoints)
+    bspline = zeros(fittingPoints, length(controlPoints[1,:]))
+    for i=1:fittingPoints
+        bspline[i,:] = bsplineAtParam(paramRange[i], k, M, controlPoints, matrix)
+    end
+    bspline
+end
+
+function bsplineAtParam(t, k, M, controlPoints, matrix)
+    value = zeros(length(controlPoints[1,:]))'
+    if length(controlPoints[:,1]) != (k+M)
+        error("Control points aren't enough")
+    end
+    for i=1:(k+M)
+        v = controlPoints[i,:]
+        N_ik = matrix[i,k]
+        value += v*N_ik(t)
+    end
+    value
 end
 
 function extendedPartitionAttempt(k, partition, spacing::Clumped)
@@ -57,9 +86,24 @@ function extendedPartitionAttempt(k, partition, spacing::Clumped)
     [previous_zeros; middle; following_ones;]
 end
 
+function extendedPartitionAttempt(k, partition, spacing::Uniformed)
+    M = length(partition)
+    range = (1-k)/(M+1):1/(M+1):(1+ (k-1)/(M+1))
+    nel = length(range)
+    extended = zeros(nel)
+    for i=1:nel
+        extended[i] = range[i]
+    end
+    extended
+end
+
+
 function buildFunctionsMatrix(k, M, extendedPartition)
+    if (2*k + M) != length(extendedPartition)
+        error("partition length mismatch dimension")
+    end
     firstColumn = []
-    for i=1:(k+M)
+    for i=1:(k+M+1)
         fn = (t ->
               if (extendedPartition[i] <= t && t < extendedPartition[i+1])
                   1
@@ -68,7 +112,7 @@ function buildFunctionsMatrix(k, M, extendedPartition)
               end)
         firstColumn = [firstColumn; fn;]
     end
-    firstColumn = [firstColumn; (t -> 0);]
+     ## firstColumn = [firstColumn; (t -> 0);]
 
     matrix = [firstColumn]
     for h=2:k
@@ -87,12 +131,19 @@ function buildFunctionsMatrix(k, M, extendedPartition)
                 addend_coeff =  1 / addend_denominator
             end
             
-            fn = t -> ((t - extendedPartition[i]) * augend_coeff * matrix[i,end](t) +
-                       (extendedPartition[i+h] - t) * addend_coeff * matrix[i+1,end](t))
+            fn = t -> ((t - extendedPartition[i]) * augend_coeff * matrix[i,h-1](t) +
+                       (extendedPartition[i+h] - t) * addend_coeff * matrix[i+1,h-1](t))
             
             column = [column; fn;]
         end
-        column = [column; (t -> 0);]
+        lastFn = (t ->
+              if (extendedPartition[k+M+1] <= t && t < extendedPartition[k+M+2])
+                  0
+              else
+                  0
+              end)
+
+        column = [column; lastFn;]
         matrix = [matrix column]
     end
     
