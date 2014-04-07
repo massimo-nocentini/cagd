@@ -12,6 +12,15 @@ set output 'exercise-zero-closed.eps'
 plot [-3:4] "exercise-zero-closed-control-poly.coordinates" with linespoints pt 6, \
      "exercise-zero-closed-bspline.coordinates" with lines
 
+set output 'exercise-six-first-closed.eps'
+plot [-3:4] [2:16]"exercise-six-first-closed-control-poly.coordinates" with linespoints pt 6, \
+     "exercise-six-first-closed-bspline.coordinates" with lines
+
+set output 'exercise-six-second-closed.eps'
+plot [-3:4] [2:16]"exercise-six-second-closed-control-poly.coordinates" with linespoints pt 6, \
+     "exercise-six-second-closed-bspline.coordinates" with lines
+
+
 # set output 'exercise-two.eps'
 # plot [0.5:3.5] [-0.3:1.3] "bezier-exercise-two.coordinates" with lines, "control-poly-exercise-two.coordinates" with linespoints pt 6
 

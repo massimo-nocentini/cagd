@@ -4,5 +4,6 @@ all: drawings
 
 drawings:
 	$(JULIA) --eval "include(\"bspline.jl\"); \
-		exercise_zero();";
+		exercise_zero(); \
+		exercise_six();	";
 	gnuplot bspline.gnuplot;

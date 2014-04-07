@@ -60,13 +60,53 @@ function exercise_zero()
     
 end
 
+function exercise_six()
+
+    k = 4
+    
+    firstClosedControlPoints = [
+                                [1.0 4];
+                                [-0.8 4];
+                                [-1.9 8.2];
+                                [0.3 13.2];
+                                [2.8 4];
+                                [1.0 4];
+                                ]
+
+    firstClosedBSpline = drawBSpline(k, firstClosedControlPoints, 200)
+    writeArrayForGnuplot(firstClosedControlPoints,
+                         "exercise-six-first-closed-control-poly.coordinates")
+
+    writeArrayForGnuplot(firstClosedBSpline,
+                         "exercise-six-first-closed-bspline.coordinates")
+
+    secondClosedControlPoints = [
+                                 [0.4 6];
+                                 [-1.8 3];
+                                 [-2 14.8];
+                                 [0.4 11];
+                                 [3.0 14];
+                                 [3.4 2.2];
+                                 [0.4 6];
+                                 ]
+   
+    secondClosedBSpline = drawBSpline(k, secondClosedControlPoints, 200)
+    writeArrayForGnuplot(secondClosedControlPoints,
+                         "exercise-six-second-closed-control-poly.coordinates")
+
+    writeArrayForGnuplot(secondClosedBSpline,
+                         "exercise-six-second-closed-bspline.coordinates")
+
+    
+end
+
 function drawBSpline(k, controlPoints, fittingPoints)
 
     if controlPoints[1,:] == controlPoints[end,:]
 
         m = length(controlPoints[:,1])
         newPartition = [i for i in (-k/(m-1):1/(m-1):(k+m-1)/(m-1))]
-        print(newPartition)
+
         M = sum(ones(m))
         matrix = buildFunctionsMatrix(k, M, newPartition)
 
