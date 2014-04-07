@@ -9,7 +9,7 @@ plot [-3:4] "exercise-zero-uniformed-control-poly.coordinates" with linespoints 
      "exercise-zero-uniformed-bspline.coordinates" with lines
 
 set output 'exercise-zero-closed.eps'
-plot [-3:4] "exercise-zero-closed-control-poly.coordinates" with linespoints pt 6, \
+plot [-3:4] [1:16]"exercise-zero-closed-control-poly.coordinates" with linespoints pt 6, \
      "exercise-zero-closed-bspline.coordinates" with lines
 
 set output 'exercise-six-first-closed.eps'
@@ -19,6 +19,14 @@ plot [-3:4] [2:16]"exercise-six-first-closed-control-poly.coordinates" with line
 set output 'exercise-six-second-closed.eps'
 plot [-3:4] [2:16]"exercise-six-second-closed-control-poly.coordinates" with linespoints pt 6, \
      "exercise-six-second-closed-bspline.coordinates" with lines
+
+set output 'exercise-one-clumped.eps'
+plot [-4:5] [-3:3] "exercise-one-control-poly.coordinates" with linespoints pt 6, \
+     "exercise-one-clumped-bspline-k-two.coordinates" with lines, \
+     "exercise-one-clumped-bspline-k-three.coordinates" with lines, \
+     "exercise-one-clumped-bspline-k-four.coordinates" with lines, \
+     "exercise-one-clumped-bspline-k-five.coordinates" with lines, \
+     "exercise-one-clumped-bspline-k-six.coordinates" with lines               
 
 
 # set output 'exercise-two.eps'
