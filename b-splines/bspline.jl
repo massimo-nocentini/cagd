@@ -48,9 +48,40 @@ function exercise_zero()
     writeArrayForGnuplot(bspline,
                          "exercise-zero-uniformed-bspline.coordinates")
 
+
+    closedControlPoints = [controlPoints; controlPoints[1,:];]
+    closedBSpline = drawBSpline(k, closedControlPoints, 200)
+    writeArrayForGnuplot(closedControlPoints,
+                         "exercise-zero-closed-control-poly.coordinates")
+
+    writeArrayForGnuplot(closedBSpline,
+                         "exercise-zero-closed-bspline.coordinates")
+
+    
+end
+
+function drawBSpline(k, controlPoints, fittingPoints)
+
+    if controlPoints[1,:] == controlPoints[end,:]
+
+        m = length(controlPoints[:,1])
+        newPartition = [i for i in (-k/(m-1):1/(m-1):(k+m-1)/(m-1))]
+        print(newPartition)
+        M = sum(ones(m))
+        matrix = buildFunctionsMatrix(k, M, newPartition)
+
+        for i=1:k
+            controlPoints = [controlPoints; controlPoints[i+1,:]]
+        end
+        
+        return drawCurve(newPartition, k, M, controlPoints, matrix, fittingPoints)
+    end
+
 end
 
 function drawCurve(extendedPartition, k, M, controlPoints, matrix, fittingPoints)
+
+    
     ## paramRange = linspace(minimum(extendedPartition),
     ##                       maximum(extendedPartition),
     ##                       fittingPoints)
