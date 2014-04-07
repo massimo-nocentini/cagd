@@ -28,6 +28,10 @@ plot [-4:5] [-3:3] "exercise-one-control-poly.coordinates" with linespoints pt 6
      "exercise-one-clumped-bspline-k-five.coordinates" with lines, \
      "exercise-one-clumped-bspline-k-six.coordinates" with lines               
 
+set output 'exercise-three.eps'
+plot [-4:6] [-3:4]"exercise-three-control-poly.coordinates" with linespoints pt 6, \
+     "exercise-three-bspline.coordinates" with lines
+
 
 # set output 'exercise-two.eps'
 # plot [0.5:3.5] [-0.3:1.3] "bezier-exercise-two.coordinates" with lines, "control-poly-exercise-two.coordinates" with linespoints pt 6
