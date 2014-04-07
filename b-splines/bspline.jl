@@ -51,21 +51,28 @@ function exercise_zero()
 end
 
 function drawCurve(extendedPartition, k, M, controlPoints, matrix, fittingPoints)
-    paramRange = linspace(minimum(extendedPartition),
-                          maximum(extendedPartition),
+    ## paramRange = linspace(minimum(extendedPartition),
+    ##                       maximum(extendedPartition),
+    ##                       fittingPoints)
+
+    fittingPoints += 1
+    paramRange = linspace(0,
+                          1,
                           fittingPoints)
+
     bspline = zeros(fittingPoints, length(controlPoints[1,:]))
     for i=1:fittingPoints
         bspline[i,:] = bsplineAtParam(paramRange[i], k, M, controlPoints, matrix)
     end
-    bspline
+    ## bspline
+    bspline[1:end-1, :]
 end
 
 function bsplineAtParam(t, k, M, controlPoints, matrix)
     value = zeros(length(controlPoints[1,:]))'
-    if length(controlPoints[:,1]) != (k+M)
-        error("Control points aren't enough")
-    end
+    ## if length(controlPoints[:,1]) != (k+M)
+    ##     error("Control points aren't enough")
+    ## end
     for i=1:(k+M)
         v = controlPoints[i,:]
         N_ik = matrix[i,k]
@@ -112,7 +119,7 @@ function buildFunctionsMatrix(k, M, extendedPartition)
               end)
         firstColumn = [firstColumn; fn;]
     end
-     ## firstColumn = [firstColumn; (t -> 0);]
+    ## firstColumn = [firstColumn; (t -> 0);]
 
     matrix = [firstColumn]
     for h=2:k
@@ -151,22 +158,22 @@ function buildFunctionsMatrix(k, M, extendedPartition)
     
 end
 
-function extendPartition(k, partition, continuityVector, spacing::Clumped)
+## function extendPartition(k, partition, continuityVector, spacing::Clumped)
 
-    extended = []
-    extended = [extended; [partition[1,:] for j=1:k]]
-        print(typeof(extended))
-        print(typeof(      extended[:,1]))
+##     extended = []
+##     extended = [extended; [partition[1,:] for j=1:k]]
+##         print(typeof(extended))
+##         print(typeof(      extended[:,1]))
     
-    for i=1:length(continuityVector)        
-        augmenting = [partition[i + 1,:] for q=1:(continuityVector[i])]
-        extended = [extended; augmenting;]
-    end
+##     for i=1:length(continuityVector)        
+##         augmenting = [partition[i + 1,:] for q=1:(continuityVector[i])]
+##         extended = [extended; augmenting;]
+##     end
 
-    tail = [partition[end,:] for j=1:k]
-    extended = [extended; tail;]
-    extended
-end
+##     tail = [partition[end,:] for j=1:k]
+##     extended = [extended; tail;]
+##     extended
+## end
 
         
 
