@@ -147,6 +147,80 @@ function exercise_one()
 
 end
 
+function exercise_two()
+    controlPoints = [
+                     [-0.7 -0.4];
+                     [-1 -1];
+                     [-1.3 -0.3];
+                     [-1 1.2];
+                     [-0.3 1.4];
+                     [-0.15 0];
+                     [0.15 0];
+                     [0.3 1.6];
+                     [2 0.6];
+                     [2.6 0.2];
+                     ]
+
+    writeArrayForGnuplot(controlPoints,
+                         "exercise-two-control-poly.coordinates")
+
+    k = 4
+    extendedPartition = expandPartition(0:10, [4 [1 for _ in 1:10]'])
+    extendedPartition = normalizeRespect(extendedPartition, Maximum())
+    M = sum(ones(6))
+    matrix = buildFunctionsMatrix(k, M, extendedPartition)
+    fittingPoints = 200
+    bspline = drawCurve(extendedPartition, k, M, controlPoints, matrix, fittingPoints)   
+
+    writeArrayForGnuplot(bspline,
+                         "exercise-two-bspline-first.coordinates")
+
+    k = 4
+    extendedPartition = expandPartition(0:4, [4 2 2 2 4])
+    extendedPartition = normalizeRespect(extendedPartition, Maximum())
+    M = sum(ones(6))
+    matrix = buildFunctionsMatrix(k, M, extendedPartition)
+    fittingPoints = 200
+    bspline = drawCurve(extendedPartition, k, M, controlPoints, matrix, fittingPoints)   
+
+    writeArrayForGnuplot(bspline,
+                         "exercise-two-bspline-second.coordinates")
+
+    k = 6
+    extendedPartition = expandPartition(0:5, [6 1 1 1 1 6])
+    extendedPartition = normalizeRespect(extendedPartition, Maximum())
+    M = sum(ones(4))
+    matrix = buildFunctionsMatrix(k, M, extendedPartition)
+    fittingPoints = 200
+    bspline = drawCurve(extendedPartition, k, M, controlPoints, matrix, fittingPoints)   
+
+    writeArrayForGnuplot(bspline,
+                         "exercise-two-bspline-three.coordinates")
+
+    k = 6
+    extendedPartition = expandPartition(0:4, [6 1 1 2 6])
+    extendedPartition = normalizeRespect(extendedPartition, Maximum())
+    M = sum(ones(4))
+    matrix = buildFunctionsMatrix(k, M, extendedPartition)
+    fittingPoints = 200
+    bspline = drawCurve(extendedPartition, k, M, controlPoints, matrix, fittingPoints)   
+
+    writeArrayForGnuplot(bspline,
+                         "exercise-two-bspline-four.coordinates")
+
+    k = 8
+    extendedPartition = expandPartition(0:3, [8 1 1 8])
+    extendedPartition = normalizeRespect(extendedPartition, Maximum())
+    M = sum(ones(2))
+    matrix = buildFunctionsMatrix(k, M, extendedPartition)
+    fittingPoints = 200
+    bspline = drawCurve(extendedPartition, k, M, controlPoints, matrix, fittingPoints)   
+
+    writeArrayForGnuplot(bspline,
+                         "exercise-two-bspline-five.coordinates")
+
+    
+end
 
 function exercise_three()
     controlPoints = [
@@ -474,22 +548,25 @@ function buildFunctionsMatrix(k, M, extendedPartition)
     
 end
 
-## function extendPartition(k, partition, continuityVector, spacing::Clumped)
+type Maximum end
 
-##     extended = []
-##     extended = [extended; [partition[1,:] for j=1:k]]
-##         print(typeof(extended))
-##         print(typeof(      extended[:,1]))
+function normalizeRespect(vector, _::Maximum)
+    m = maximum(vector)
+    return map(t -> t/m, vector)
+end
+
+function expandPartition(partition, multiplicityVector)
+
+    extended = []
     
-##     for i=1:length(continuityVector)        
-##         augmenting = [partition[i + 1,:] for q=1:(continuityVector[i])]
-##         extended = [extended; augmenting;]
-##     end
+    for i=1:length(multiplicityVector)
+        augmenting = [partition[i] for _=1:multiplicityVector[i] ]
+        extended = [extended; augmenting;]
+    end
 
-##     tail = [partition[end,:] for j=1:k]
-##     extended = [extended; tail;]
-##     extended
-## end
+    extended
+end
+
 
         
 

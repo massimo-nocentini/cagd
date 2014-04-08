@@ -9,5 +9,6 @@ drawings:
 		exercise_one(); \
 		exercise_three(); \
 		exercise_four(); \
-		exercise_five(); ";
+		exercise_five(); \
+		exercise_two(); ";
 	gnuplot bspline.gnuplot;
