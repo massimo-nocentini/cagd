@@ -32,6 +32,11 @@ set output 'exercise-three.eps'
 plot [-4:6] [-3:4]"exercise-three-control-poly.coordinates" with linespoints pt 6, \
      "exercise-three-bspline.coordinates" with lines
 
+set output 'exercise-four.eps'
+plot [-4:4] [1:7]"exercise-four-control-poly.coordinates" with linespoints pt 6, \
+     "exercise-four-bspline-first-partition.coordinates" with lines, \
+     "exercise-four-bspline-second-partition.coordinates" with lines     
+
 
 # set output 'exercise-two.eps'
 # plot [0.5:3.5] [-0.3:1.3] "bezier-exercise-two.coordinates" with lines, "control-poly-exercise-two.coordinates" with linespoints pt 6

@@ -7,5 +7,6 @@ drawings:
 		exercise_zero(); \
 		exercise_six();	\
 		exercise_one(); \
-		exercise_three(); ";
+		exercise_three(); \
+		exercise_four(); ";
 	gnuplot bspline.gnuplot;

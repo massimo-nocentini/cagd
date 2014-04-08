@@ -178,6 +178,51 @@ function exercise_three()
                          "exercise-three-bspline.coordinates")
 end
 
+function exercise_four()
+    controlPoints = [
+                     [-2.0 2];
+                     [-3.0 4];
+                     [0 6];
+                     [0 6];
+                     [3 4];
+                     [2.0 2];
+                     ]
+
+    writeArrayForGnuplot(controlPoints,
+                         "exercise-four-control-poly.coordinates")
+    
+    fittingPoints = 200
+    
+    k = 4
+    ## continuityVector = ones(3)
+    ## extendedPartition = extendedPartitionAttempt(k, continuityVector, Clumped())
+    extendedPartition = [0 0 0 0 1/4 3/4 1 1 1 1]
+    M = 2
+    matrix = buildFunctionsMatrix(k, M, extendedPartition)
+    bspline = drawCurve(extendedPartition,
+                        k,
+                        M,
+                        controlPoints,
+                        matrix,
+                        fittingPoints)
+    writeArrayForGnuplot(bspline,
+                         "exercise-four-bspline-first-partition.coordinates")
+
+    extendedPartition = [0 0 0 0 1/2 1/2 1 1 1 1]
+    M = 2
+    matrix = buildFunctionsMatrix(k, M, extendedPartition)
+    bspline = drawCurve(extendedPartition,
+                        k,
+                        M,
+                        controlPoints,
+                        matrix,
+                        fittingPoints)
+    writeArrayForGnuplot(bspline,
+                         "exercise-four-bspline-second-partition.coordinates")
+
+end
+
+
 function exercise_six()
 
     k = 4
