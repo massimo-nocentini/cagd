@@ -17,26 +17,57 @@ function exercise_one ()
     writeArrayForGnuplot(bezierCurvePoints, "bezier-exercise-one.coordinates")
 end
 
+function exercise_three()
+    x = t -> 1 + t + t^2
+    y = t -> t^3
+    points = zeros(200, 2)
+    params = linspace(0,1,200)
+    for i=1:200
+        t = params[i]
+        points[i,:] =
+            [x(t) y(t)]
+    end
+    writeArrayForGnuplot(points, "test-exercise-three.coordinates")
+end
+
+
 function exercise_two ()
+
+    maximaControlPoints = [
+                           [1.0 0];
+                           [4/3 0];
+                           [2.0 0];
+                           [3.0 1];
+                           ]
+    
+    maximaBezierCurvePoints = drawCurve(maximaControlPoints,
+				  linspace(0,1,200))
+
+    writeArrayForGnuplot(maximaControlPoints,
+                         "control-poly-exercise-three-maxima.coordinates")
+
+    writeArrayForGnuplot(maximaBezierCurvePoints,
+                         "bezier-exercise-three-maxima.coordinates")
+    
     controlPoints = parametricCoordinates([
 			                   x -> 1 + x + x^2;
 			                   y -> y^3
-		                           ], 6)
+		                           ], 200)
 
-    bezierCurvePoints = drawCurve(controlPoints,
-				  linspace(0,1,200))
+    ## bezierCurvePoints = drawCurve(controlPoints,
+    ##     			  linspace(0,1,200))
 
-    writeArrayForGnuplot(bezierCurvePoints, "bezier-exercise-two.coordinates")
-    writeArrayForGnuplot(controlPoints, "control-poly-exercise-two.coordinates")
+    ## writeArrayForGnuplot(bezierCurvePoints, "bezier-exercise-two.coordinates")
+    writeArrayForGnuplot(controlPoints, "parametric-curve-exercise-three.coordinates")
 
     controlPoints = parametricCoordinates([
-			                   x -> 1 + x + x^2;
-			                   y -> y^3;
-			                   z -> z^2 - pi/2
-		                           ], 6)
+        		                   x -> 1 + x + x^2;
+        		                   y -> y^3;
+        		                   z -> z^2 - pi/2
+        	                           ], 6)
 
     bezierCurvePoints = drawCurve(controlPoints,
-				  linspace(0,1,200))
+        			  linspace(0,1,200))
 
     writeArrayForGnuplot(bezierCurvePoints, "bezier-three-axes-exercise-two.coordinates")
     writeArrayForGnuplot(controlPoints, "control-three-axes-poly-exercise-two.coordinates")

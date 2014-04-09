@@ -1,0 +1,37 @@
+/* [wxMaxima batch file version 1] [ DO NOT EDIT BY HAND! ]*/
+/* [ Created with wxMaxima version 13.04.2 ] */
+
+/* [wxMaxima: input   start ] */
+a:v0*(1-t)^3 + v1*3*t*(1-t)^2 + v2*3*(t^2)*(1-t) + v3*t^3;
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+b:ratsimp(a,t);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+b = 1 + t + t^2 + 0*t^3;
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+solve([coeff(b, t,3) = 0, coeff(b, t,2) = 1, coeff(b, t,1) = 1, coeff(b, t,0) = 1], [v0,v1,v2,v3]);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+a:y0*(1-t)^3 + y1*3*t*(1-t)^2 + y2*3*(t^2)*(1-t) + y3*t^3;
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+b:ratsimp(a,t);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+b = t^3;
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+solve([coeff(b, t,3) = 1, coeff(b, t,2) = 0, coeff(b, t,1) = 0, coeff(b, t,0) = 0], [y0,y1,y2,y3]);
+/* [wxMaxima: input   end   ] */
+
+/* Maxima can't load/batch files which end with a comment! */
+"Created with wxMaxima"$
