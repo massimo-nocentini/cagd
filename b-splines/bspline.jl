@@ -166,11 +166,16 @@ function exercise_two()
 
     k = 4
     extendedPartition = expandPartition(0:10, [4 [1 for _ in 1:10]'])
-    extendedPartition = normalizeRespect(extendedPartition, Maximum())
+    extendedPartition = normalizeRespect(extendedPartition, Maximum(), k-1)
     M = sum(ones(6))
     matrix = buildFunctionsMatrix(k, M, extendedPartition)
     fittingPoints = 200
-    bspline = drawCurve(extendedPartition, k, M, controlPoints, matrix, fittingPoints)   
+    bspline = drawCurve(extendedPartition,
+                        k,
+                        M,
+                        controlPoints,
+                        matrix,
+                        fittingPoints)   
 
     writeArrayForGnuplot(bspline,
                          "exercise-two-bspline-first.coordinates")
@@ -445,17 +450,21 @@ function drawCurve(extendedPartition, k, M, controlPoints, matrix, fittingPoints
     ##                       maximum(extendedPartition),
     ##                       fittingPoints)
 
-    fittingPoints += 1
+    ## fittingPoints += 1
     paramRange = linspace(0,
-                          1,
+                          1-eps(Float64),
                           fittingPoints)
 
     bspline = zeros(fittingPoints, length(controlPoints[1,:]))
     for i=1:fittingPoints
-        bspline[i,:] = bsplineAtParam(paramRange[i], k, M, controlPoints, matrix)
+        bspline[i,:] = bsplineAtParam(paramRange[i],
+                                      k,
+                                      M,
+                                      controlPoints,
+                                      matrix)
     end
-    ## bspline
-    bspline[1:end-1, :]
+    bspline
+    ## bspline[1:end-1, :]
 end
 
 function bsplineAtParam(t, k, M, controlPoints, matrix)
@@ -550,8 +559,8 @@ end
 
 type Maximum end
 
-function normalizeRespect(vector, _::Maximum)
-    m = maximum(vector)
+function normalizeRespect(vector, _::Maximum, k = 0)
+    m = maximum(vector[1:end - k])
     return map(t -> t/m, vector)
 end
 
