@@ -7,10 +7,10 @@
 \usepackage[square,numbers]{natbib} 
 \usepackage{amsmath, amsthm, amssymb, tikz}
 \usetikzlibrary{snakes}
-\newtheorem{definizione}{Definizione}  
-\newtheorem{lemma}{Lemma}
-\newtheorem{teorema}{Teorema}  
-\newtheorem{proprieta}{Proprietà}  
+% \newtheorem{definizione}{Definizione}  
+% \newtheorem{lemma}{Lemma}
+% \newtheorem{teorema}{Teorema}  
+% \newtheorem{proprieta}{Proprietà}  
 \usepackage{titletoc}
 \usepackage{verbatim}
 \usepackage{hyperref}
@@ -24,7 +24,7 @@
     Design course exercises}}
 
 \author{\spacedlowsmallcaps{Massimo Nocentini}}
-\date{\today} % no date
+\date{\today}
 
 \maketitle
 
@@ -159,10 +159,95 @@ those Bezier curves in the same plot and each one is over the others).
 \includegraphics{bezier-deCasteljau-curves/exercise-seven-obsculating-left}
 \includegraphics{bezier-deCasteljau-curves/exercise-seven-a_i-left}
 
+\section{B-Splines}
+
+\subsection{Mushrooms from clumped, uniformed and closed partitions}
+\begin{figure}
+  \centering
+  \includegraphics{b-splines/exercise-zero-clumped.eps}
+  \caption{Mushroom from clumped partition}
+  \label{fig:clumpled-mushroom}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \includegraphics{b-splines/exercise-zero-uniformed.eps}
+  \caption{Mushroom from uniformed partition}
+  \label{fig:uniformed-mushroom}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \includegraphics{b-splines/exercise-zero-closed.eps}
+  \caption{Mushroom from closed partition}
+  \label{fig:closed-mushroom}
+\end{figure}
+
+\subsection{Increasing order $k$ while decreasing \emph{continuity} vector }
+\begin{figure}
+  \centering
+  \includegraphics{b-splines/exercise-one-clumped.eps}
+  \caption{Decreasing the \emph{continuity} vector collapsing in a Bezier }
+  \label{fig:bspline-exercise-one-clumped}
+\end{figure}
+
+\subsection{Knots' multiplicities against the same control polygon}
+\begin{figure}
+  \centering
+  \includegraphics{b-splines/exercise-two.eps}
+  \caption{Knots's multiplicities increased against the same control polygon }
+  \label{fig:bspline-exercise-two}
+\end{figure}
+
+\subsection{Linearity near doubled control point with a clumped partition}
+\begin{figure}
+  \centering
+  \includegraphics{b-splines/exercise-three.eps}
+  \caption{Linearity toward $(1,1)$ due to ``linearized'' convex hull}
+  \label{fig:bspline-exercise-three}
+\end{figure}
+
+\subsection{Two clumped partitions, different \emph{continuity} vectors and same control polygon}
+\begin{figure}
+  \centering
+  \includegraphics{b-splines/exercise-four.eps}
+  \caption{Same control polygon with doubled $(0,6)$ againts two clumped partitions}
+  \label{fig:bspline-exercise-four}
+\end{figure}
+
+\subsection{Increasing clumped partitions for increasing occurrences of a control point}
+\begin{figure}
+  \centering
+  \includegraphics{b-splines/exercise-five.eps}
+  \caption{Three B-Splines, each for $1,2,3$ occurrences of $(0,1)$ respectively }
+  \label{fig:bspline-exercise-five}
+\end{figure}
+
+\subsection{Two B-Splines from two closed partitions}
+\begin{figure}
+  \centering
+  \includegraphics{b-splines/exercise-six-first-closed.eps}
+  \caption{A first B-Spline from a closed partition }
+  \label{fig:bspline-exercise-six-first}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \includegraphics{b-splines/exercise-six-second-closed.eps}
+  \caption{A second B-Spline from a closed partition }
+  \label{fig:bspline-exercise-six-second}
+\end{figure}
+
+
 \section{Code}
+
 \subsection{de Casteljau}
 \label{sec:deCasteljau-code}
 \verbatiminput{bezier-deCasteljau-curves/deCasteljau.jl}
+
+\subsection{Cox and de Boor}
+\label{sec:Cox-deBoor-code}
+\verbatiminput{b-splines/bspline.jl}
 
 \newpage
 

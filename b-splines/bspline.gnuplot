@@ -1,8 +1,8 @@
 set terminal postscript eps enhanced color font 'Helvetica,10'
 
-set output 'exercise-zero-clamped.eps'
-plot [-3:4]  "exercise-zero-clamped-control-poly.coordinates" with linespoints pt 6, \
-     "exercise-zero-clamped-bspline.coordinates" with lines
+set output 'exercise-zero-clumped.eps'
+plot [-3:4]  "exercise-zero-clumped-control-poly.coordinates" with linespoints pt 6, \
+     "exercise-zero-clumped-bspline.coordinates" with lines
 
 set output 'exercise-zero-uniformed.eps'
 plot [-3:4] "exercise-zero-uniformed-control-poly.coordinates" with linespoints pt 6, \

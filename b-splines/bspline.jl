@@ -31,10 +31,10 @@ function exercise_zero()
     bspline = drawCurve(extendedPartition, k, M, controlPoints, matrix, fittingPoints)
    
     writeArrayForGnuplot(controlPoints,
-                         "exercise-zero-clamped-control-poly.coordinates")
+                         "exercise-zero-clumped-control-poly.coordinates")
 
     writeArrayForGnuplot(bspline,
-                         "exercise-zero-clamped-bspline.coordinates")
+                         "exercise-zero-clumped-bspline.coordinates")
 
     extendedPartition = extendedPartitionAttempt(k, ones(6), Uniformed())
     M = sum(ones(6))
