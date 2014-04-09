@@ -4,6 +4,7 @@ all: drawings
 
 drawings:
 	$(JULIA) --eval "include(\"bspline.jl\"); \
+		include(\"exercises.jl\"); \
 		exercise_zero(); \
 		exercise_six();	\
 		exercise_one(); \
