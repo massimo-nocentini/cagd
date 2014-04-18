@@ -178,11 +178,12 @@ function knotsInsertion(controlPoints, partition, n, L)
     print(I)
     last_index = L+n+1
     refined_partition = zeros(last_index)
-    for i=1:I-n+1
+    
+    for i=1:I-n+2
         refined_partition[i] = partition[i]
     end
 
-    for i=I-n+2:I+1
+    for i=I-n+3:I+1
         refined_partition[i] = 1/n*(sum(partition[i:i+n-2]) + u)
     end
 
@@ -190,23 +191,23 @@ function knotsInsertion(controlPoints, partition, n, L)
         refined_partition[i] = partition[i-1]
     end
 
-    refined_controlPoints = zeros(last_index, length(controlPoints[1,:]))
+    refined_controlPoints = zeros(last_index+1, length(controlPoints[1,:]))
 
-    for i=1:I-n+1
+    for i=1:I-n+2
         refined_controlPoints[i,:] = controlPoints[i,:]
     end
 
-    for i=I-n+2:I+1
-        diff = partition[i]-partition[i-1]
+    for i=I-n+3:I+1
+        diff = partition[i+n-1]-partition[i-1]
         coeff = if (diff > 0) 1/diff else 0 end
-        first_coeff = partition[i] - refined_partition[i]
-        second_coeff = refined_partition[i] - partition[i-1]
-        refined_controlPoints[i,:] = coeff*(first_coeff*controlPoints[i-1,:] -
+        first_coeff = partition[i+n-1] - u
+        second_coeff = u - partition[i-1]
+        refined_controlPoints[i,:] = coeff*(first_coeff*controlPoints[i-1,:] +
                                             second_coeff*controlPoints[i,:])
     end
 
-    for i=I+2:last_index
-        refined_controlPoints[i,:] = controlPoints[i,:]
+    for i=I+2:last_index+1
+        refined_controlPoints[i,:] = controlPoints[i-1,:]
     end
 
     
