@@ -426,11 +426,11 @@ function exercise_knotsInsertion()
                      [4.0 0.5];
                      ]
 
-    partition = [-1 0.5 1.8 2.8 3.2 4]
+    partition = [-1; 0.5; 1.8; 2.8; 3.2; 4;]
 
     k = 3
-    refined_controlPoints, refined_partition, n, L =
-        knotsInsertion(controlPoints, partition, k, 1)
+    refined_controlPoints =
+        knotsInsertion_head(controlPoints, partition, k, 1)
     
     writeArrayForGnuplot(controlPoints,
                          "exercise-knots-insertion-original-control-points.coordinates")

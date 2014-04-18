@@ -159,13 +159,48 @@ function expandPartition(partition, multiplicityVector)
     extended
 end
 
-function knotsInsertion(controlPoints, partition, n, L)
-    working_partition = partition[n:n+L]
-    ## u = working_partition[1] + rand()*(working_partition[end]-working_partition[1])
-    u = 2.5
+function knotsInsertion_head(controlPoints, partition, n, L)
 
-    ## if (count(x -> x == u, working_partition) == n)
-    ##     return 0
+    fittingPoints = 100
+    working_partition = partition[n:n+L]
+    paramRange = linspace(working_partition[1],
+                          working_partition[end],
+                          fittingPoints)
+    
+    ## u = working_partition[1] + rand()*(working_partition[end]-working_partition[1])
+    
+    results = zeros(fittingPoints, length(controlPoints[1,:]))
+    for j=1:fittingPoints-1
+
+        u = paramRange[j]
+        
+        workingControlPoints = controlPoints
+        workingPartition = partition
+        workingL = L
+
+        for i=1:n
+            workingControlPoints, workingPartition, workingL =
+                knotsInsertion(workingControlPoints, workingPartition, n, workingL, u)
+        end
+        print(j)
+        for i=1:length(workingControlPoints[:,1])-1
+            if(workingControlPoints[i,:] == workingControlPoints[i+1,:])
+                results[j,:] = workingControlPoints[i,:]
+                break
+            end
+        end
+    end
+
+    results[1:end-1,:]
+end
+    
+function knotsInsertion(controlPoints, partition, n, L, u)
+    ## working_partition = partition[n:n+L]
+    ## ## u = working_partition[1] + rand()*(working_partition[end]-working_partition[1])
+    ## u = 2.5
+
+    ## if (count(x -> x == u, partition) == n)
+    ##     return controlPoints, partition, n, L
     ## end
 
     I = -1
@@ -175,19 +210,19 @@ function knotsInsertion(controlPoints, partition, n, L)
             break
         end
     end
-    print(I)
+
     last_index = L+n+1
-    refined_partition = zeros(last_index)
+    refined_partition = zeros(last_index+1)
     
     for i=1:I-n+2
         refined_partition[i] = partition[i]
     end
 
     for i=I-n+3:I+1
-        refined_partition[i] = 1/n*(sum(partition[i:i+n-2]) + u)
+        refined_partition[i] = (1/n)*(sum(partition[i:i+n-2]) + u)
     end
 
-    for i=I+2:last_index
+    for i=I+2:last_index+1
         refined_partition[i] = partition[i-1]
     end
 
@@ -210,6 +245,6 @@ function knotsInsertion(controlPoints, partition, n, L)
         refined_controlPoints[i,:] = controlPoints[i-1,:]
     end
 
-    
-    refined_controlPoints, sort([refined_partition; u;]), n, L+1
+    partition = [partition; u]
+    refined_controlPoints, sort(partition), L+1
 end
