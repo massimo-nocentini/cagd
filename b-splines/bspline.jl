@@ -159,6 +159,40 @@ function expandPartition(partition, multiplicityVector)
     extended
 end
 
+function knotsInsertion(aVector, k)
+    augmenting = [[1 1]]
+    columns = length(aVector[1,:])
+    for i=1:length(aVector[:,1])-1
 
+        vect = zeros(1, columns)
+        j = 0
+        for q=1:k-1        
+
+            left = ones(k-1)
+            for j = 1:(k-1)
+                left[j] = (k-j-1)/(k+1)
+            end
+            
+            vect += (k-j-1)/(k+1)*aVector[i+q-1,:]
+            augmenting = [augmenting; vect;]
+            ## augmenting = [augmenting; ((k-j-1)/(k+1)*aVector[i,:] + (j)/(k+1)*aVector[i+1,:]);]
+            j += 1
+            vect = zeros(1, columns)
+
+        ## augmenting = [augmenting; (3/4*aVector[i,:] + 1/4*aVector[i+1,:]);]
+        ## augmenting = [augmenting; (1/4*aVector[i,:] + 3/4*aVector[i+1,:]);]
+
+           
+            
+            #augmenting = [augmenting; ((k-j-1)/(k+1)*aVector[i,:] + (j)/(k+1)*aVector[i,:]);]
+        end
         
+        
+    end
 
+    if aVector[1,:] == aVector[end,:]
+        augmenting = [augmenting; (3/4*aVector[1,:] + 1/4*aVector[2,:]);]
+    end
+    
+    augmenting[2:end,:]
+end

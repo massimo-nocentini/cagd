@@ -56,3 +56,7 @@ plot [-2:3] [-1.5:2]"exercise-two-control-poly.coordinates" with linespoints pt 
 plot [-2:3] [-1.5:2]"exercise-two-control-poly.coordinates" with linespoints pt 6, \
      "exercise-two-bspline-five.coordinates" with lines
 unset multiplot
+
+set output 'exercise-knots-insertion.eps'
+plot [-1:3] [-0.5:2.5]"exercise-knots-insertion.coordinates" with lines, \
+     "exercise-knots-insertion-deBoor.coordinates" with lines     

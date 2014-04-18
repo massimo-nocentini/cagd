@@ -14,6 +14,8 @@
 \usepackage{titletoc}
 \usepackage{verbatim}
 \usepackage{hyperref}
+\usepackage{boxedminipage}
+% \usepackage{framed}
 
 \titlecontents{section}[3em]{}{\contentslabel{1em}}{}{\titlerule*[1.5pc]{.}\contentspage}
 \titlecontents{subsection}[6em]{}{\contentslabel{2em}}{}{\titlerule*[1.5pc]{.}\contentspage}
@@ -63,7 +65,8 @@ curve in red built using the given control points.
 
 \subsection{Curve from parametric specification}
 As required in Exercise 3, in \autoref{fig:curve-from-parametric-spec}
-we report a Bezier curve built from the parametric specification:
+we report a Bezier curve matching the following parametric
+specification:
 \begin{displaymath}
   \left [  \begin{array}{c}
       x(u) \\
@@ -74,10 +77,130 @@ we report a Bezier curve built from the parametric specification:
       u^3
     \end{array} \right ]
 \end{displaymath}
-with $u\in[0,1]$. For plotting we choose to sample 6 control points,
-uniformly spaced in $[0,1]$: observe that there isn't a relation
-between the uniform sampling for the parameter $u$ and control points
-distribution on the plane.
+with $u\in[0,1]$. In order to find the control polygon we do simple
+reductions with \emph{Maxima}:
+
+\noindent
+%%%%%%%%%%%%%%%
+%%% INPUT:
+\begin{verbatim}
+a:v0*(1-t)^3 + v1*3*t*(1-t)^2 + v2*3*(t^2)*(1-t) + v3*t^3;
+\end{verbatim}}
+%%% OUTPUT:
+\definecolor{labelcolor}{RGB}{100,0,0}
+\begin{math}\displaystyle
+\parbox{8ex}{\color{labelcolor}(\%o1) }
+{t}^{3}\,v3+3\,\left( 1−t\right) \,{t}^{2}\,v2+3\,{\left( 1−t\right) }^{2}\,t\,v1+{\left( 1−t\right) }^{3}\,v0
+\end{math}
+
+
+\noindent
+%%%%%%%%%%%%%%%
+% %%% INPUT:
+% \begin{minipage}[t]{8ex}{\color{red}\bf
+% \begin{verbatim}
+% (%i2) 
+% \end{verbatim}}
+% \end{minipage}
+% \begin{minipage}[t]{\textwidth}{\color{blue}
+\begin{verbatim}
+b:ratsimp(a,t);
+\end{verbatim}}
+%%% OUTPUT:
+\definecolor{labelcolor}{RGB}{100,0,0}
+\begin{math}\displaystyle
+\parbox{8ex}{\color{labelcolor}(\%o2) }
+{t}^{3}\,\left( v3−3\,v2+3\,v1−v0\right) +{t}^{2}\,\left( 3\,v2−6\,v1+3\,v0\right) +t\,\left( 3\,v1−3\,v0\right) +v0
+\end{math}
+
+\noindent
+%%% INPUT:
+\begin{verbatim}
+b = 1 + t + t^2 + 0*t^3;
+\end{verbatim}}
+%%% OUTPUT:
+\definecolor{labelcolor}{RGB}{100,0,0}
+\begin{math}\displaystyle
+\parbox{8ex}{\color{labelcolor}(\%o3) }
+{t}^{3}\,\left( v3−3\,v2+3\,v1−v0\right) +{t}^{2}\,\left( 3\,v2−6\,v1+3\,v0\right) +t\,\left( 3\,v1−3\,v0\right) +v0={t}^{2}+t+1
+\end{math}
+
+
+\noindent
+%%% INPUT:
+\begin{verbatim}
+solve([coeff(b, t,3) = 0, coeff(b, t,2) = 1, coeff(b, t,1) = 1, coeff(b, t,0) = 1], [v0,v1,v2,v3]);
+\end{verbatim}}
+%%% OUTPUT:
+\definecolor{labelcolor}{RGB}{100,0,0}
+\begin{math}\displaystyle
+\parbox{8ex}{\color{labelcolor}(\%o4) }
+[[v0=1,v1=\frac{4}{3},v2=2,v3=3]]
+\end{math}
+%%%%%%%%%%%%%%%
+
+
+\noindent
+%%%%%%%%%%%%%%%
+%%% INPUT:
+\begin{verbatim}
+a:y0*(1-t)^3 + y1*3*t*(1-t)^2 + y2*3*(t^2)*(1-t) + y3*t^3;
+\end{verbatim}}
+%%% OUTPUT:
+\definecolor{labelcolor}{RGB}{100,0,0}
+\begin{math}\displaystyle
+\parbox{8ex}{\color{labelcolor}(\%o5) }
+{t}^{3}\,y3+3\,\left( 1−t\right) \,{t}^{2}\,y2+3\,{\left( 1−t\right) }^{2}\,t\,y1+{\left( 1−t\right) }^{3}\,y0
+\end{math}
+%%%%%%%%%%%%%%%
+
+
+\noindent
+%%%%%%%%%%%%%%%
+%%% INPUT:
+\begin{verbatim}
+b:ratsimp(a,t);
+\end{verbatim}}
+%%% OUTPUT:
+\definecolor{labelcolor}{RGB}{100,0,0}
+\begin{math}\displaystyle
+\parbox{8ex}{\color{labelcolor}(\%o6) }
+{t}^{3}\,\left( y3−3\,y2+3\,y1−y0\right) +{t}^{2}\,\left( 3\,y2−6\,y1+3\,y0\right) +t\,\left( 3\,y1−3\,y0\right) +y0
+\end{math}
+%%%%%%%%%%%%%%%
+
+
+\noindent
+%%%%%%%%%%%%%%%
+%%% INPUT:
+\begin{verbatim}
+b = t^3;
+\end{verbatim}}
+%%% OUTPUT:
+\definecolor{labelcolor}{RGB}{100,0,0}
+\begin{math}\displaystyle
+\parbox{8ex}{\color{labelcolor}(\%o7) }
+{t}^{3}\,\left( y3−3\,y2+3\,y1−y0\right) +{t}^{2}\,\left( 3\,y2−6\,y1+3\,y0\right) +t\,\left( 3\,y1−3\,y0\right) +y0={t}^{3}
+\end{math}
+%%%%%%%%%%%%%%%
+
+
+\noindent
+%%%%%%%%%%%%%%%
+%%% INPUT:
+\begin{verbatim}
+solve([coeff(b, t,3) = 1, coeff(b, t,2) = 0, coeff(b, t,1) = 0, coeff(b, t,0) = 0], [y0,y1,y2,y3]);
+\end{verbatim}}
+%%% OUTPUT:
+\definecolor{labelcolor}{RGB}{100,0,0}
+\begin{math}\displaystyle
+\parbox{8ex}{\color{labelcolor}(\%o8) }
+[[y0=0,y1=0,y2=0,y3=1]]
+\end{math}
+%%%%%%%%%%%%%%%
+
+Hence four control points are $\{(1,0), (\frac{3}{4},0), (2,0),
+(3,1)\}$.
 \begin{figure}
   \centering
   \includegraphics{bezier-deCasteljau-curves/exercise-two}

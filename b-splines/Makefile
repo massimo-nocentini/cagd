@@ -11,5 +11,6 @@ drawings:
 		exercise_three(); \
 		exercise_four(); \
 		exercise_five(); \
-		exercise_two(); ";
+		exercise_two(); \
+		exercise_knotsInsertion(); ";
 	gnuplot bspline.gnuplot;

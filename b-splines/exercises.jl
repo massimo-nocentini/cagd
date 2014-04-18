@@ -416,3 +416,28 @@ function exercise_six()
 
     
 end
+
+function exercise_knotsInsertion()
+    controlPoints = [
+                     [0.0 0.0];
+                     [0.0 2];
+                     [2.0 2];
+                     [2.0 0];
+                     [0.0 0.0];
+                     ]
+    
+    ## secondClosedBSpline = drawBSpline(k, controlPoints, 200)
+    k = 3
+    secondClosedControlPoints = controlPoints
+    for i=1:5
+        secondClosedControlPoints = knotsInsertion(secondClosedControlPoints, k)
+    end
+    writeArrayForGnuplot(secondClosedControlPoints,
+                         "exercise-knots-insertion.coordinates")
+
+    deBoorBSpline = drawBSpline(k, controlPoints, 200)
+    writeArrayForGnuplot(deBoorBSpline,
+                         "exercise-knots-insertion-deBoor.coordinates")
+
+    
+end

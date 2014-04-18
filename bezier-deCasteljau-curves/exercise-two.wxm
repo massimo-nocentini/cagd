@@ -33,5 +33,9 @@ b = t^3;
 solve([coeff(b, t,3) = 1, coeff(b, t,2) = 0, coeff(b, t,1) = 0, coeff(b, t,0) = 0], [y0,y1,y2,y3]);
 /* [wxMaxima: input   end   ] */
 
+/* [wxMaxima: input   start ] */
+kill(all);
+/* [wxMaxima: input   end   ] */
+
 /* Maxima can't load/batch files which end with a comment! */
 "Created with wxMaxima"$
