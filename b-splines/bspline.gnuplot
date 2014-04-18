@@ -58,5 +58,5 @@ plot [-2:3] [-1.5:2]"exercise-two-control-poly.coordinates" with linespoints pt 
 unset multiplot
 
 set output 'exercise-knots-insertion.eps'
-plot "exercise-knots-insertion.coordinates" with linespoints pt 6, \
+plot [-1:5] [-1:3] "exercise-knots-insertion.coordinates" with lines, \
      "exercise-knots-insertion-original-control-points.coordinates" with linespoints pt 6

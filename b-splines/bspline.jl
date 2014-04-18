@@ -173,7 +173,7 @@ function knotsInsertion_head(controlPoints, partition, n, L)
     for j=1:fittingPoints-1
 
         u = paramRange[j]
-        
+
         workingControlPoints = controlPoints
         workingPartition = partition
         workingL = L
@@ -182,13 +182,14 @@ function knotsInsertion_head(controlPoints, partition, n, L)
             workingControlPoints, workingPartition, workingL =
                 knotsInsertion(workingControlPoints, workingPartition, n, workingL, u)
         end
-        print(j)
-        for i=1:length(workingControlPoints[:,1])-1
-            if(workingControlPoints[i,:] == workingControlPoints[i+1,:])
-                results[j,:] = workingControlPoints[i,:]
-                break
-            end
-        end
+
+        ## for i=1:length(workingControlPoints[:,1])-1
+        ##     if(workingControlPoints[i,:] == workingControlPoints[i+1,:])
+                k = findfirst(x -> x == u, workingPartition) 
+                results[j,:] = workingControlPoints[k,:]
+        ##         break
+        ##     end
+        ## end
     end
 
     results[1:end-1,:]
