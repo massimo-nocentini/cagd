@@ -420,24 +420,27 @@ end
 function exercise_knotsInsertion()
     controlPoints = [
                      [0.0 0.0];
-                     [0.0 2];
-                     [2.0 2];
-                     [2.0 0];
-                     [0.0 0.0];
+                     [1.0 2.0];
+                     [2.0 2.5];
+                     [3.0 2.2];
+                     [4.0 0.5];
                      ]
-    
-    ## secondClosedBSpline = drawBSpline(k, controlPoints, 200)
-    k = 3
-    secondClosedControlPoints = controlPoints
-    for i=1:5
-        secondClosedControlPoints = knotsInsertion(secondClosedControlPoints, k)
-    end
-    writeArrayForGnuplot(secondClosedControlPoints,
-                         "exercise-knots-insertion.coordinates")
 
-    deBoorBSpline = drawBSpline(k, controlPoints, 200)
-    writeArrayForGnuplot(deBoorBSpline,
-                         "exercise-knots-insertion-deBoor.coordinates")
+    partition = [-1 0.5 1.8 2.8 3.2 4]
+
+    k = 3
+    refined_controlPoints, refined_partition, n, L =
+        knotsInsertion(controlPoints, partition, k, 1)
+    
+    writeArrayForGnuplot(controlPoints,
+                         "exercise-knots-insertion-original-control-points.coordinates")
+
+    writeArrayForGnuplot(refined_controlPoints,
+                         "exercise-knots-insertion.coordinates")
+    
+    ## deBoorBSpline = drawBSpline(k, controlPoints, 200)
+    ## writeArrayForGnuplot(deBoorBSpline,
+    ##                      "exercise-knots-insertion-deBoor.coordinates")
 
     
 end

@@ -159,40 +159,56 @@ function expandPartition(partition, multiplicityVector)
     extended
 end
 
-function knotsInsertion(aVector, k)
-    augmenting = [[1 1]]
-    columns = length(aVector[1,:])
-    for i=1:length(aVector[:,1])-1
+function knotsInsertion(controlPoints, partition, n, L)
+    working_partition = partition[n:n+L]
+    ## u = working_partition[1] + rand()*(working_partition[end]-working_partition[1])
+    u = 2.5
 
-        vect = zeros(1, columns)
-        j = 0
-        for q=1:k-1        
+    ## if (count(x -> x == u, working_partition) == n)
+    ##     return 0
+    ## end
 
-            left = ones(k-1)
-            for j = 1:(k-1)
-                left[j] = (k-j-1)/(k+1)
-            end
-            
-            vect += (k-j-1)/(k+1)*aVector[i+q-1,:]
-            augmenting = [augmenting; vect;]
-            ## augmenting = [augmenting; ((k-j-1)/(k+1)*aVector[i,:] + (j)/(k+1)*aVector[i+1,:]);]
-            j += 1
-            vect = zeros(1, columns)
-
-        ## augmenting = [augmenting; (3/4*aVector[i,:] + 1/4*aVector[i+1,:]);]
-        ## augmenting = [augmenting; (1/4*aVector[i,:] + 3/4*aVector[i+1,:]);]
-
-           
-            
-            #augmenting = [augmenting; ((k-j-1)/(k+1)*aVector[i,:] + (j)/(k+1)*aVector[i,:]);]
+    I = -1
+    for i = length(partition):-1:(n+1)
+        if(partition[i] > u && partition[i-1] <= u)
+            I = i-1
+            break
         end
-        
-        
+    end
+    print(I)
+    last_index = L+n+1
+    refined_partition = zeros(last_index)
+    for i=1:I-n+1
+        refined_partition[i] = partition[i]
     end
 
-    if aVector[1,:] == aVector[end,:]
-        augmenting = [augmenting; (3/4*aVector[1,:] + 1/4*aVector[2,:]);]
+    for i=I-n+2:I+1
+        refined_partition[i] = 1/n*(sum(partition[i:i+n-2]) + u)
     end
+
+    for i=I+2:last_index
+        refined_partition[i] = partition[i-1]
+    end
+
+    refined_controlPoints = zeros(last_index, length(controlPoints[1,:]))
+
+    for i=1:I-n+1
+        refined_controlPoints[i,:] = controlPoints[i,:]
+    end
+
+    for i=I-n+2:I+1
+        diff = partition[i]-partition[i-1]
+        coeff = if (diff > 0) 1/diff else 0 end
+        first_coeff = partition[i] - refined_partition[i]
+        second_coeff = refined_partition[i] - partition[i-1]
+        refined_controlPoints[i,:] = coeff*(first_coeff*controlPoints[i-1,:] -
+                                            second_coeff*controlPoints[i,:])
+    end
+
+    for i=I+2:last_index
+        refined_controlPoints[i,:] = controlPoints[i,:]
+    end
+
     
-    augmenting[2:end,:]
+    refined_controlPoints, sort([refined_partition; u;]), n, L+1
 end
