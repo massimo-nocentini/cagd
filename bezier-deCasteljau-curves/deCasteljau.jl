@@ -156,11 +156,26 @@ end
 
 function derivative(differencePoints, param)
     n = length(differencePoints[:,1])
-    value = zeros(differencePoints[1,:])
-    B = i -> binomial(n, i) * param^i * (1 - param)^(n - i); 
+    value = zeros( length(differencePoints[1,:]))'
+    B = i -> binomial(n, i) * (param^i) * ((1 - param)^(n - i))
     for i=1:n
         value = value + differencePoints[i,:]*B(i)
     end
     value * (n+1)
 end
 
+
+function polar(controlPoints, param, respect_to)
+
+    n = length(controlPoints[:,1]) - 1
+    
+    polarpoint = zeros(length(controlPoints[1,:]))'
+
+    B = i -> binomial(n, i) * (param^i) * ((1 - param)^(n - i))
+
+    for i=1:n
+        polarpoint += ((1-respect_to)*controlPoints[i,:] + respect_to*controlPoints[i+1,:])*B(i)
+    end
+
+    polarpoint
+end

@@ -334,3 +334,50 @@ function exercise_derivative()
 		         "derivative-of-exercise-one.coordinates")
 
 end
+
+function exercise_polar()
+    controlPoints = [
+                     [0.0 0.0];
+                     [0.0 4.0];
+                     [2.0 4.0];
+                     [1.0 2.0];
+                     ]
+
+    n = length(controlPoints[:,1])
+    params = 200
+    differencePoints = difference(controlPoints)
+    derivativePoints = zeros(params, 2)
+    polarPoints = zeros(params, 2)
+    bezierPoints = zeros(params, 2)
+
+    j = 1
+    for i=linspace(0,1,params)
+        derivativePoints[j,:] = derivative(differencePoints,i)
+	aPoint, Diagonal, Last = decasteljau(controlPoints, i)
+	bezierPoints[j,:] = aPoint
+        ## polarPoints[j,:] = aPoint + ((0.4 - i)/n)*derivativePoints[j,:]
+        polarPoints[j,:] = polar(controlPoints, i, 0.4)
+        j += 1
+    end
+
+    writeArrayForGnuplot(controlPoints,
+                         "control-poly-polar.coordinates")
+
+    ## bezierCurvePoints = drawCurve(controlPoints,
+    ##     			  linspace(0,1,200))
+
+    writeArrayForGnuplot(bezierPoints, "bezier-polar.coordinates")
+
+    
+    ## writeArrayForGnuplot(drawCurve([
+    ##                                 [0.0 0 0];
+    ##                                 differencePoints;
+    ##                                 [0.0 0 0];
+    ##                                 ],
+    ##                                linspace(0,1,200)),
+    ##     	         "differences-of-exercise-one.coordinates")
+    
+    writeArrayForGnuplot(polarPoints,
+		         "derivative-polar.coordinates")
+
+end

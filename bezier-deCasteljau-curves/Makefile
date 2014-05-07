@@ -1,4 +1,5 @@
-JULIA="/home/mn/Developer/working-copies/julia/julia"
+## use the following variable to point to your julia executable
+JULIA=julia
 
 all: drawings
 
@@ -11,5 +12,6 @@ drawings:
 		exercise_five(); \
 		exercise_six(); \
 		exercise_seven(); \
-		exercise_seven_left(); ";
+		exercise_seven_left(); \
+		exercise_polar()";
 	gnuplot bezier.gnuplot;

@@ -84,4 +84,10 @@ plot [-0.5:25] [-5:20] "control-poly-base-left-exercise-seven-exercise-seven.coo
 
 set output 'exercise-seven-a_i-left.eps'
 plot "control-poly-base-obsculating-left-exercise-seven.coordinates" with linespoints pt 6, \
-	"control-poly-base-obsculating-with-a-i-left-exercise-seven.coordinates" with linespoints pt 6
+     "control-poly-base-obsculating-with-a-i-left-exercise-seven.coordinates" with linespoints pt 6
+
+set output 'exercise-polar.eps'
+plot [-0.5:2.5] [-0.5:4.5] "control-poly-polar.coordinates" with linespoints pt 6, \
+     "bezier-polar.coordinates" with linespoints pt 6, \
+     "derivative-polar.coordinates" with linespoints pt 6
+

@@ -1,4 +1,5 @@
-JULIA="/home/mn/Developer/working-copies/julia/julia"
+# JULIA="/home/mn/Developer/working-copies/julia/julia"
+JULIA=julia
 
 all: drawings
 
