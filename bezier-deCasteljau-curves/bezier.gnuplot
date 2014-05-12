@@ -88,6 +88,6 @@ plot "control-poly-base-obsculating-left-exercise-seven.coordinates" with linesp
 
 set output 'exercise-polar.eps'
 plot [-0.5:2.5] [-0.5:4.5] "control-poly-polar.coordinates" with linespoints pt 6, \
-     "bezier-polar.coordinates" with linespoints pt 6, \
-     "derivative-polar.coordinates" with linespoints pt 6
+     "bezier-polar.coordinates" with lines, \
+     "derivative-polar.coordinates" with lines 
 

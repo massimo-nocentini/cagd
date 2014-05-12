@@ -167,14 +167,14 @@ end
 
 function polar(controlPoints, param, respect_to)
 
-    n = length(controlPoints[:,1]) - 1
+    n = length(controlPoints[:,1]) -1 
     
     polarpoint = zeros(length(controlPoints[1,:]))'
 
-    B = i -> binomial(n, i) * (param^i) * ((1 - param)^(n - i))
+    B = i -> binomial(n-1, i) * (param^i) * ((1 - param)^(n -1 - i))
 
     for i=1:n
-        polarpoint += ((1-respect_to)*controlPoints[i,:] + respect_to*controlPoints[i+1,:])*B(i)
+        polarpoint += ((1-respect_to)*controlPoints[i,:] + respect_to*controlPoints[i+1,:])*B(i-1)
     end
 
     polarpoint
