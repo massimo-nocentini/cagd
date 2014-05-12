@@ -1,0 +1,10 @@
+SOME THOUGHTS
+
+* Conti little project
+  After a meeting with Sestini, the following should be interesting to
+  include in my document:
+  - explain the symmetry and multiaffinity of the Blossing
+  - ask for ``Interactive curves and surfaces'' by Rockwood volume
+  - search for ``A tutorial introduction to blossoming'' by Goldman and deRose
+    
+  
