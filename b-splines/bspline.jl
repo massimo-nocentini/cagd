@@ -249,3 +249,46 @@ function knotsInsertion(controlPoints, partition, n, L, u)
     partition = [partition; u]
     refined_controlPoints, sort(partition), L+1
 end
+
+function deBoor (extendedBreakpointArray,
+                 controlPointsMatrix,
+                 tabulationArray)
+
+    dimension, numberOfControlPoints = size (controlPointsMatrix)
+    k = length (extendedBreakpointArray) - numberOfControlPoints
+
+    C = zeros (dimension, length (tabulationArray))
+    ind = 0
+
+    for r = k:numberOfControlPoints
+
+        comparison = r < n ? .< : .<= ;
+        isd = (tabulationArray .>= extendedBreakpointArray [r]) & (comparison(tabulationArray, extendedBreakpointArray [r+1]))
+
+        nloc = sum (isd)
+
+        if nloc < 1
+            continue
+        end
+
+        tloc = tabulationArray[isd]
+        Qloc = zeros (k, nloc, dimension)
+
+        ## the following is a one line in substitution of the next line of code
+        ## broadcast(+, [[1 2 5]; [3 4 6];], zeros(2, 3, 2))
+        [Qloc[:,:,i] = Q[i, r-k+1:r]' * ones(1,nloc) for i=1:dimension]
+        
+        for j=1:k-1
+            alfa = zeros(k-1,nloc)
+            for i=1:k-j
+                alfa[i,:] = (tloc - t[i+r-k+j])/ (t[i+r] - t[i+r-k+j])
+                [Qloc[i,:,s] = (1-alfa[i,:]) .* Qloc[i,:,s] + alfa[i,:] .* Qloc[i+1,:,s] for s=1:dimension]
+            end
+        end            
+
+        [C[i, ind+1:ind+nloc] = Qloc[1, 1:nloc, i] for i=1:dimension]
+        ind += nloc
+        
+    end
+
+end
