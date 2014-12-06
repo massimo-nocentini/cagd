@@ -93,29 +93,75 @@ def extend_knots_vector(order, interval, internal_knots, closed=False, multiplic
 
     return closed_case() if closed else open_case()
         
-def draw(order, interval, internal_knots, control_net, tabs=None, closed=False, multiplicities=None):
+def draw(order, interval, internal_knots, control_net, 
+            tabs=None, points=1000, closed=False, multiplicities=None):
+    """
+    Produces a set of point representing the BSpline interpolation of the given control net.
+    """
 
     d, n = np.shape(control_net)
     if closed:
         assert n == order + sum(multiplicities) - order + 1
-        control_net = np.concatenate((control_net, control_net[:,:order-1]), axis=1)
+        control_net = np.concatenate((control_net, control_net[:, :order-1]), axis=1)
     else:
         assert n == order + sum(multiplicities)
 
     if tabs is None:
         a, b = interval
-        tabs = np.linspace(start=a, stop=b, num=1000*(b-a))
+        tabs = np.linspace(start=a, stop=b, num=points*(b-a))
 
-    extend_knots_vector = extend_knots_partition(
+    extended_vector = extend_knots_partition(
         order, interval, internal_knots, closed, multiplicities)
 
+    return de_Boor(extended_vector, control_net, tabs)
 
+def de_Boor(extended_knots_partition, control_net, tabs): 
+    """
+    Produces BSpline curve interpolating the given control net.
 
+    """
 
+    import operator
 
+    d, n = np.shape(control_net)
+    order = len(extended_knots_partition) - n
 
+    C = np.zeros((d, len(tabs)))
+   
+    ind = 0 
 
+    def foreach_dimension(f):
+        for i in range(d): f(i)
 
+    for r in range(order-1, n-1):
+        comparer = operator.le if r is n-1 else operator.lt
+        isd = np.where(extended_knots_partition[r] <= tabs 
+                        and comparer(tabs, extended_knots_partition[r+1]))
+        nloc = sum(isd)
 
+        if not nloc: continue
+
+        tloc = tabs[isd]
+        Qloc = np.zeros((order, nloc, d))
+
+#       Pay attention that the following statement is assigning a complete matrix
+        for i in range(d): 
+            Qloc[:,:,i] = np.matrix(control_net[i,r-order+1:r+1]).transpose().dot(np.ones((1, nloc)))
+        #Qloc[:,:,:] = [np.matrix(control_net[i, r-order+1:r]).transpose().dot(np.ones((1, nloc)))
+        #                for i in range(d)]
+
+        for j in range(1, order):
+            alfa = np.zeros((order-j, nloc)) 
+            # alfa = np.zeros((order-1, nloc)) # this is the original version given by Sestini
+            for i in range(0, order-j):
+                inf_extrema = extended_knots_partition[i+1+r-order+j]
+                alfa[i,:] = ((tloc - inf_extrema) / (extended_knots_partition[i+1+r] - inf_extrema))
+                for s in range(d): Qloc[i,:,s] = (1-alfa[i,:])*Qloc[i,:,s] + alfa[i,:]*Qloc[i+1,:,s] 
+
+        for i in range(d): C[i, ind:ind+nloc] = Qloc[0, :, i]
+
+        ind += nloc
+
+    return C
 
 
