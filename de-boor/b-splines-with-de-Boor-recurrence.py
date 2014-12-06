@@ -118,20 +118,21 @@ def draw(order, interval, internal_knots, control_net,
 def de_Boor(extended_knots_partition, control_net, tabs): 
     """
     Produces BSpline curve interpolating the given control net.
-
     """
 
     import operator
+
+    control_net = control_net.transpose()
 
     d, n = np.shape(control_net)
     order = len(extended_knots_partition) - n
 
     C = np.zeros((d, len(tabs)))
-   
-    ind = 0 
 
     def foreach_dimension(f):
         for i in range(d): f(i)
+
+    ind = 0 
 
     for r in range(order-1, n-1):
         comparer = operator.le if r is n-1 else operator.lt
@@ -144,11 +145,10 @@ def de_Boor(extended_knots_partition, control_net, tabs):
         tloc = tabs[isd]
         Qloc = np.zeros((order, nloc, d))
 
-#       Pay attention that the following statement is assigning a complete matrix
-        for i in range(d): 
-            Qloc[:,:,i] = np.matrix(control_net[i,r-order+1:r+1]).transpose().dot(np.ones((1, nloc)))
-        #Qloc[:,:,:] = [np.matrix(control_net[i, r-order+1:r]).transpose().dot(np.ones((1, nloc)))
-        #                for i in range(d)]
+        def build_temp_matrix(i):
+            Qloc[:,:,i] = np.matrix(control_net[i,r-order+1:r+1]).transpose().dot(
+                                        np.ones((1, nloc)))
+        foreach_dimension(build_temp_matrix)
 
         for j in range(1, order):
             alfa = np.zeros((order-j, nloc)) 
@@ -156,12 +156,16 @@ def de_Boor(extended_knots_partition, control_net, tabs):
             for i in range(0, order-j):
                 inf_extrema = extended_knots_partition[i+1+r-order+j]
                 alfa[i,:] = ((tloc - inf_extrema) / (extended_knots_partition[i+1+r] - inf_extrema))
-                for s in range(d): Qloc[i,:,s] = (1-alfa[i,:])*Qloc[i,:,s] + alfa[i,:]*Qloc[i+1,:,s] 
 
-        for i in range(d): C[i, ind:ind+nloc] = Qloc[0, :, i]
+                def baricentric_combine(s): 
+                    Qloc[i,:,s] = (1-alfa[i,:])*Qloc[i,:,s] + alfa[i,:]*Qloc[i+1,:,s] 
+                foreach_dimension(baricentric_combine)
+
+        def fill_in_curve_points(i): C[i, ind:ind+nloc] = Qloc[0, :, i]
+        foreach_dimension(fill_in_curve_points)
 
         ind += nloc
 
-    return C
+    return C.transpose()
 
 
