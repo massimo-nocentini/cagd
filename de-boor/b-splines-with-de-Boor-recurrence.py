@@ -2,30 +2,50 @@
 
 import numpy as np
 
-def extend_knots_vector(order, a, b, internal_knots, closed=False, multiplicities=None):
-    """
-    This function produces an extended knots vector for BSpline functions given a simple one.
+def extend_knots_vector(order, interval, internal_knots, closed=False, multiplicities=None):
+    """Produces an extended knots vector for BSpline functions given a simple one.
+
+    This function extend the given knots partition adding auxiliary knots 
+    on the left and on the right of the given ones in order to be the support
+    for drawing curves, both with `open` control nets both with `closed` ones.
+    Fails if the given knots partition doesn't match their multiplicities 
+    respect length of their lists.
 
     Parameters
     ==========
-    a :
+    order -- the order of the curve which will be drawn on this extended knots partition 
+    interval -- interval containing the given knot partition. Pay attention that
+                interval extrema shouldn't appear in the knots partition. It should
+                be given in binary tuple form, ie. (a, b) for some a and b.
+    internal_knots -- knots partition: this should be thought as a set, therefore
+                        knot multiplicity is specified in an auxiliary vector
+    closed --   boolean value that indicate if this knots partition will be used
+                to draw closed or open curves. Defaults to False.
+    multiplicities --   list of multiplicities, one for each knot specified in 
+                        `internal_knots` argument. Defaults to a list of 1s.
 
     Examples
     ========
 
     Simple extension for an open curve:
-    >>> extend_knots_vector(4, 3, 6, [4, 5])
+    >>> extend_knots_vector(4, (3, 6), [4, 5])
     array([ 3.,  3.,  3.,  3.,  4.,  5.,  6.,  6.,  6.,  6.])
     
     The same as before, only specify arguments' names for better readability:
-    >>> extend_knots_vector(order=4, a=3, b=6, internal_knots=[4, 5]) 
+    >>> extend_knots_vector(order=4, interval=(3, 6), internal_knots=[4, 5]) 
     array([ 3.,  3.,  3.,  3.,  4.,  5.,  6.,  6.,  6.,  6.])
 
+    >>> extend_knots_vector(4, (3, 6), [4, 5], multiplicities=[3,3])
+    array([ 3.,  3.,  3.,  3.,  4.,  4.,  4.,  5.,  5.,  5.,  6.,  6.,  6.,  6.])
+
     Here we build an extended partition for drawing closed curves:
-    >>> extend_knots_vector(order=4, a=3, b=6, internal_knots=[4, 5], closed=True)
+    >>> extend_knots_vector(order=4, interval=(3, 6), internal_knots=[4, 5], closed=True)
     array([ 0.,  1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9.])
 
     """
+    
+    # unpacking the interval extrema
+    a, b = interval
     
     # The following could be another way destructure the partition but it is less clear
     # how to distinguish an empty partition (ie. [a, b]) from a filled one.
@@ -33,6 +53,8 @@ def extend_knots_vector(order, a, b, internal_knots, closed=False, multiplicitie
     
     if multiplicities is None:
         multiplicities = np.repeat(1, len(internal_knots))
+
+    assert len(internal_knots) == len(multiplicities)
 
     def repeat_internal_knots_by_multiplicities_in(extended_vector):
         index = order
