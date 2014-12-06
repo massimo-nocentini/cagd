@@ -64,7 +64,7 @@ def extend_knots_vector(order, interval, internal_knots, closed=False, multiplic
 
     def open_case(): 
         extended_vector = np.empty(order + sum(multiplicities) + order)
-        extended_vector[0:order] = np.repeat(a, order)
+        extended_vector[:order] = np.repeat(a, order)
         repeat_internal_knots_by_multiplicities_in(extended_vector)
         extended_vector[-order:] = np.repeat(b, order)
 
@@ -76,6 +76,9 @@ def extend_knots_vector(order, interval, internal_knots, closed=False, multiplic
         repeat_internal_knots_by_multiplicities_in(extended_vector)
         extended_vector[-order] = b
         
+# I'm not able to find a better name to replace `idim`. However
+# in the following expression we put evidence on the first two 1s since
+# they count knots `a` and `b` respectively.
         idim = 1 + sum(multiplicities) + 1 + (order - 1) 
 
         for i in range(order-2, -1, -1):
@@ -90,3 +93,29 @@ def extend_knots_vector(order, interval, internal_knots, closed=False, multiplic
 
     return closed_case() if closed else open_case()
         
+def draw(order, interval, internal_knots, control_net, tabs=None, closed=False, multiplicities=None):
+
+    d, n = np.shape(control_net)
+    if closed:
+        assert n == order + sum(multiplicities) - order + 1
+        control_net = np.concatenate((control_net, control_net[:,:order-1]), axis=1)
+    else:
+        assert n == order + sum(multiplicities)
+
+    if tabs is None:
+        a, b = interval
+        tabs = np.linspace(start=a, stop=b, num=1000*(b-a))
+
+    extend_knots_vector = extend_knots_partition(
+        order, interval, internal_knots, closed, multiplicities)
+
+
+
+
+
+
+
+
+
+
+
