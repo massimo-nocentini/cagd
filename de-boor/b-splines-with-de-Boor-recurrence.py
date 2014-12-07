@@ -148,22 +148,35 @@ def de_Boor(extended_knots_partition, control_net, tabs):
 
         nloc = len(tloc)
 
+#       The following handle the case where no tabulation point belong to 
+#       the corrent subinterval between consecutive internal knots.
+#       This could happen if a non uniform tabulation set of points is given.
         if not nloc: continue
 
         Qloc = np.zeros((order, nloc, d))
 
+#       The following function can be seen as the very first de Boor's algorithm step:
+#       for each dimension and for each tabulation point, it `copies` the relative
+#       control point component, the same for each tabulation point. Therefore 
+#       we can see it as the first step, ie. the initializer one.
         def build_temp_matrix(i):
             spline_support = np.matrix(control_net[i,r-order+1:r+1]).transpose()
             Qloc[:,:,i] = spline_support.dot(np.ones((1, nloc)))
         foreach_dimension(build_temp_matrix)
 
+#       `j` starts from 1 since the `0` iteration is done by the initialization above.
+#       In total, the outer `for` runs `order-1` times.
         for j in range(1, order):
             alfa = np.zeros((order-j, nloc)) 
+#           For a fixed `j`, the inner `for` runs `order-j` times, therefore the
+#           comprehensive complexity is (order-1)*order/2, in other words O(order^2)
             for i in range(0, order-j):
+#               The following shows because for a change of very first or very last knots 
+#               (or both) there isn't a change in curve's shape: they never get in `alfa`.
                 inf_extrema = extended_knots_partition[i+1+r-order+j]
                 sup_extrema = extended_knots_partition[i+1+r]
                 knots_distance = sup_extrema - inf_extrema
-                alfa[i,:] = (tloc - inf_extrema) / knots_distance if knots_distance else 0
+                alfa[i,:] = (tloc - inf_extrema) / knots_distance if knots_distance > 0 else 0
 
                 def baricentric_combine(s): 
                     Qloc[i,:,s] = (1-alfa[i,:])*Qloc[i,:,s] + alfa[i,:]*Qloc[i+1,:,s] 
@@ -174,7 +187,9 @@ def de_Boor(extended_knots_partition, control_net, tabs):
 
         ind += nloc
 
-    return C[:, :ind].transpose()
+    assert np.shape(C) == np.shape(C[:, :ind])
+
+    return C.transpose()
 
 
 def sample_internal_knots_uniformly_in(interval, number_of_knots):
