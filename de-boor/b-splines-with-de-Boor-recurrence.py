@@ -99,10 +99,13 @@ def draw(order, interval, internal_knots, control_net,
     Produces a set of point representing the BSpline interpolation of the given control net.
     """
 
+    if multiplicities is None:
+        multiplicities = np.repeat(1, len(internal_knots))
+
     n, d = np.shape(control_net)
     if closed:
         assert n == order + sum(multiplicities) - order + 1
-        control_net = np.concatenate((control_net, control_net[:, :order-1]), axis=1)
+        control_net = np.concatenate((control_net, control_net[:order-1, :]), axis=0)
     else:
         assert n == order + sum(multiplicities)
 
@@ -173,6 +176,7 @@ def de_Boor(extended_knots_partition, control_net, tabs):
         ind += nloc
 
     return C[:, :ind].transpose()
+    #return C.transpose()
 
 def exercise_one():
     """
@@ -191,19 +195,59 @@ def exercise_one():
                              [1.4, 2],
                              ])
 
-    curve = draw(order=4, interval=(-4,4), internal_knots=[-4,4], 
-                    control_net=control_net, multiplicities=[3,3])
+    #curve = draw(order=4, interval=(-4,4), internal_knots=[-4,4], 
+                    #control_net=control_net, multiplicities=[3,3])
+    curve = draw(order=4, interval=(0,1), internal_knots=[.25, .50, .75], 
+                    control_net=control_net, multiplicities=[2,2,2])
 
-    X, Y = curve[:,1], curve[1,:]
+
+    X, Y = curve[:,0], curve[:,1]
+
+    #return curve
 
     import matplotlib.pyplot as plt
+    plt.plot(control_net[:,0], control_net[:,1], "o--")
     plt.plot(X, Y)
+    plt.axis([-4, 4, 0, 16])
     plt.ylabel('some numbers')
     plt.show()
 
 
 
+def exercise_two():
+    """
+    This is a simple exercise to plot an open mushroom
+    """
+    control_net = np.matrix([
+                             [-0.2, 2],
+                             [-0.3, 6.2],
+                             [-1.2, 4.8],
+                             [-2.8, 8.8],
+                             [-0.7, 14],
+                             [1.4, 14.7],
+                             [3.6, 10.2],
+                             [3.2, 5.1],
+                             [1.5, 6.2],
+                             [1.4, 2]
+                             ])
 
+    def close_control_net(control_net=control_net):
+        return np.concatenate((control_net, control_net[0, :]), axis=0)
+
+    curve = draw(order=4, interval=(0,1), internal_knots=np.linspace(.25, .75, 9), 
+                    closed=True, control_net=control_net)
+
+    X, Y = curve[:,0], curve[:,1]
+
+    #return curve
+
+    import matplotlib.pyplot as plt
+    control_net = close_control_net()
+    plt.plot(control_net[:,0], control_net[:,1], "o--")
+    plt.plot(X, Y)
+    plt.axis([-4, 4, 0, 16])
+    plt.ylabel('some numbers')
+    plt.show()
 
 
 
