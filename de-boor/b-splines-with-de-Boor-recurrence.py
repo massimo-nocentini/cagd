@@ -153,12 +153,12 @@ def de_Boor(extended_knots_partition, control_net, tabs):
         Qloc = np.zeros((order, nloc, d))
 
         def build_temp_matrix(i):
-            Qloc[:,:,i] = np.matrix(control_net[i,r-order+1:r+1]).transpose().dot(np.ones((1, nloc)))
+            spline_support = np.matrix(control_net[i,r-order+1:r+1]).transpose()
+            Qloc[:,:,i] = spline_support.dot(np.ones((1, nloc)))
         foreach_dimension(build_temp_matrix)
 
         for j in range(1, order):
             alfa = np.zeros((order-j, nloc)) 
-            # alfa = np.zeros((order-1, nloc)) # this is the original version given by Sestini
             for i in range(0, order-j):
                 inf_extrema = extended_knots_partition[i+1+r-order+j]
                 sup_extrema = extended_knots_partition[i+1+r]
@@ -175,6 +175,31 @@ def de_Boor(extended_knots_partition, control_net, tabs):
         ind += nloc
 
     return C[:, :ind].transpose()
+
+
+def sample_internal_knots_uniformly_in(interval, number_of_knots):
+    """
+    Returns an numpy array containing internal knots uniformly placed.
+
+    This function is useful to generate a partion of `internal` knots
+    to be paired with desired multiplicities. It is implemented to be
+    used by `client` functions written by users.
+
+    Simple example sampling from (0,1) segment:
+    >>> sample_internal_knots_uniformly_in(interval=(0,1), number_of_knots=3)
+    array([ 0.25,  0.5 ,  0.75])
+
+    Another simple test:
+    >>> sample_internal_knots_uniformly_in(interval=(0,11), number_of_knots=10)
+    array([  1.,   2.,   3.,   4.,   5.,   6.,   7.,   8.,   9.,  10.])
+    """
+
+    a, b = interval
+    interval_with_extrema = np.linspace(
+        start=a, stop=b, num=number_of_knots+2, endpoint=True)
+    return interval_with_extrema[1:-1] # discard the first and the last
+
+
 
 def exercise_one():
     """
@@ -193,9 +218,9 @@ def exercise_one():
                              [1.4, 2],
                              ])
 
-    #curve = draw(order=4, interval=(-4,4), internal_knots=[-4,4], 
-                    #control_net=control_net, multiplicities=[3,3])
-    curve = draw(order=4, interval=(0,1), internal_knots=[.25, .50, .75], 
+    interval = (0,1)
+    internal_knots = sample_internal_knots_uniformly_in(interval, 3)
+    curve = draw(order=4, interval=interval, internal_knots=internal_knots, 
                     control_net=control_net, multiplicities=[2,2,2])
 
 
@@ -232,7 +257,9 @@ def exercise_two():
     def close_control_net(control_net=control_net):
         return np.concatenate((control_net, control_net[0, :]), axis=0)
 
-    curve = draw(order=4, interval=(0,1), internal_knots=np.linspace(.25, .75, 9), 
+    interval = (0,1)
+    internal_knots = sample_internal_knots_uniformly_in(interval, 9)
+    curve = draw(order=4, interval=interval, internal_knots=internal_knots, 
                     closed=True, control_net=control_net)
 
     X, Y = curve[:,0], curve[:,1]
