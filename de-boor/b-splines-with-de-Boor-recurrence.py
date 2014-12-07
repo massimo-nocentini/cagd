@@ -99,7 +99,7 @@ def draw(order, interval, internal_knots, control_net,
     Produces a set of point representing the BSpline interpolation of the given control net.
     """
 
-    d, n = np.shape(control_net)
+    n, d = np.shape(control_net)
     if closed:
         assert n == order + sum(multiplicities) - order + 1
         control_net = np.concatenate((control_net, control_net[:, :order-1]), axis=1)
@@ -110,7 +110,7 @@ def draw(order, interval, internal_knots, control_net,
         a, b = interval
         tabs = np.linspace(start=a, stop=b, num=points*(b-a))
 
-    extended_vector = extend_knots_partition(
+    extended_vector = extend_knots_vector(
         order, interval, internal_knots, closed, multiplicities)
 
     return de_Boor(extended_vector, control_net, tabs)
@@ -122,6 +122,7 @@ def de_Boor(extended_knots_partition, control_net, tabs):
 
     import operator
 
+    tabs = np.array(tabs)
     control_net = control_net.transpose()
 
     d, n = np.shape(control_net)
@@ -134,20 +135,23 @@ def de_Boor(extended_knots_partition, control_net, tabs):
 
     ind = 0 
 
-    for r in range(order-1, n-1):
-        comparer = operator.le if r is n-1 else operator.lt
-        isd = np.where(extended_knots_partition[r] <= tabs 
-                        and comparer(tabs, extended_knots_partition[r+1]))
-        nloc = sum(isd)
+    for r in range(order-1, n):
+        
+        sup_extrema = extended_knots_partition[r+1]
+        tloc = tabs[np.where(extended_knots_partition[r] <= tabs)]
+        if r is n-1:
+            tloc = tloc[np.where(tloc <= sup_extrema)]
+        else:
+            tloc = tloc[np.where(tloc < sup_extrema)]
+
+        nloc = len(tloc)
 
         if not nloc: continue
 
-        tloc = tabs[isd]
         Qloc = np.zeros((order, nloc, d))
 
         def build_temp_matrix(i):
-            Qloc[:,:,i] = np.matrix(control_net[i,r-order+1:r+1]).transpose().dot(
-                                        np.ones((1, nloc)))
+            Qloc[:,:,i] = np.matrix(control_net[i,r-order+1:r+1]).transpose().dot(np.ones((1, nloc)))
         foreach_dimension(build_temp_matrix)
 
         for j in range(1, order):
@@ -155,7 +159,9 @@ def de_Boor(extended_knots_partition, control_net, tabs):
             # alfa = np.zeros((order-1, nloc)) # this is the original version given by Sestini
             for i in range(0, order-j):
                 inf_extrema = extended_knots_partition[i+1+r-order+j]
-                alfa[i,:] = ((tloc - inf_extrema) / (extended_knots_partition[i+1+r] - inf_extrema))
+                sup_extrema = extended_knots_partition[i+1+r]
+                knots_distance = sup_extrema - inf_extrema
+                alfa[i,:] = (tloc - inf_extrema) / knots_distance if knots_distance else 0
 
                 def baricentric_combine(s): 
                     Qloc[i,:,s] = (1-alfa[i,:])*Qloc[i,:,s] + alfa[i,:]*Qloc[i+1,:,s] 
@@ -166,6 +172,58 @@ def de_Boor(extended_knots_partition, control_net, tabs):
 
         ind += nloc
 
-    return C.transpose()
+    return C[:, :ind].transpose()
+
+def exercise_one():
+    """
+    This is a simple exercise to plot an open mushroom
+    """
+    control_net = np.matrix([
+                             [-0.2, 2],
+                             [-0.3, 6.2],
+                             [-1.2, 4.8],
+                             [-2.8, 8.8],
+                             [-0.7, 14],
+                             [1.4, 14.7],
+                             [3.6, 10.2],
+                             [3.2, 5.1],
+                             [1.5, 6.2],
+                             [1.4, 2],
+                             ])
+
+    curve = draw(order=4, interval=(-4,4), internal_knots=[-4,4], 
+                    control_net=control_net, multiplicities=[3,3])
+
+    X, Y = curve[:,1], curve[1,:]
+
+    import matplotlib.pyplot as plt
+    plt.plot(X, Y)
+    plt.ylabel('some numbers')
+    plt.show()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
