@@ -122,10 +122,9 @@ def de_Boor(extended_knots_partition, control_net, tabs):
     """
     Produces BSpline curve interpolating the given control net.
     """
+    
+    if type(tabs) is not np.ndarray: tabs = np.array(tabs)
 
-    import operator
-
-    tabs = np.array(tabs)
     control_net = control_net.transpose()
 
     d, n = np.shape(control_net)
@@ -176,7 +175,6 @@ def de_Boor(extended_knots_partition, control_net, tabs):
         ind += nloc
 
     return C[:, :ind].transpose()
-    #return C.transpose()
 
 def exercise_one():
     """
