@@ -49,7 +49,7 @@ def extend_knots_vector(order, interval, internal_knots, closed=False, multiplic
     
     # The following could be another way destructure the partition but it is less clear
     # how to distinguish an empty partition (ie. [a, b]) from a filled one.
-    #a, *internal_knots, b = internal_knots
+    # a, *internal_knots, b = internal_knots
     
     if multiplicities is None:
         multiplicities = np.repeat(1, len(internal_knots))
@@ -76,9 +76,9 @@ def extend_knots_vector(order, interval, internal_knots, closed=False, multiplic
         repeat_internal_knots_by_multiplicities_in(extended_vector)
         extended_vector[-order] = b
         
-# I'm not able to find a better name to replace `idim`. However
-# in the following expression we put evidence on the first two 1s since
-# they count knots `a` and `b` respectively.
+#       I'm not able to find a better name to replace `idim`. However
+#       in the following expression we put evidence on the first two 1s since
+#       they count knots `a` and `b` respectively.
         idim = 1 + sum(multiplicities) + 1 + (order - 1) 
 
         for i in range(order-2, -1, -1):
@@ -191,6 +191,50 @@ def de_Boor(extended_knots_partition, control_net, tabs):
 
     return C.transpose()
 
+def knot_insertion(t_hat, extended_knots_partition, control_net, order):
+    """
+    Produces an augmented knots partition and control net.
+    """
+
+    n = len(extended_knots_partition) - order
+    augmented_knots_partition = np.zeros((1, 1+len(extended_knots_partition)))
+    
+    r = order-1 # before the inf extrema of interval, namely `a`, it's forbidden
+    while r < len(extended_knots_partition):
+        if extended_knots_partition[r] >= t_hat: break
+    assert r <= n+1 # in case t_hat is the same of sup extrema of interval, ie. `b`
+
+    augmented_knots_partition[,r] = extended_knots_partition[,r] 
+    augmented_knots_partition[r] = t_hat
+    augmented_knots_partition[r+1,] = extended_knots_partition[r,] 
+
+    r -= 1 # index of inf extrema of interval containing `t_hat`
+
+    def omega(i, s=order):
+        knots_slack = extended_knots_partition[i+s-1]-extended_knots_partition[i] 
+        hat_difference = t_hat - extended_knots_partition[i]
+        return hat_difference / knots_slack if knots_slack > 0 else 0
+
+    omega = np.array(omega(i) for i in range(r-order+2, r+1))
+
+    combination_matrix = np.eye(n)
+    o = 0
+    for i in range(r-order+2, r+1): # this `for` runs `order-1` times
+        combination_matrix[i-1, i-1] = 1-omega[o]
+        combination_matrix[i-1, i] = omega[o]
+        o += 1
+    assert o == order-1
+
+    first_row = np.zeros(n)
+    first_row[0] = 1
+    combination_matrix = np.concatenate((first_row, combination_matrix), axis=0)
+
+    augmented_control_net = combination_matrix.dot(control_net)
+    
+    return augmented_knots_partition, augmented_control_net
+
+    
+
 
 def sample_internal_knots_uniformly_in(interval, number_of_knots):
     """
@@ -214,7 +258,17 @@ def sample_internal_knots_uniformly_in(interval, number_of_knots):
         start=a, stop=b, num=number_of_knots+2, endpoint=True)
     return interval_with_extrema[1:-1] # discard the first and the last
 
+def draw(control_net=None, axis="image"):
+    """
+    Draw the given curve, saving it in a file if desired.
+    """
 
+    import matplotlib.pyplot as plt
+    plt.plot(control_net[:,0], control_net[:,1], "o--")
+    plt.plot(X, Y)
+    plt.axis(axis)
+    #plt.ylabel('some numbers')
+    plt.show()
 
 def exercise_one():
     """
