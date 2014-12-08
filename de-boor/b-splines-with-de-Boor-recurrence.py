@@ -94,7 +94,8 @@ def extend_knots_vector(order, interval, internal_knots, closed=False, multiplic
     return closed_case() if closed else open_case()
         
 def draw(order, interval, internal_knots, control_net, 
-            tabs=None, points=1000, closed=False, multiplicities=None):
+            tabs=None, points=1000, closed=False, 
+            multiplicities=None, extended_vector=None):
     """
     Produces a set of point representing the BSpline interpolation of the given control net.
     """
@@ -113,8 +114,9 @@ def draw(order, interval, internal_knots, control_net,
         a, b = interval
         tabs = np.linspace(start=a, stop=b, num=points*(b-a))
 
-    extended_vector = extend_knots_vector(
-        order, interval, internal_knots, closed, multiplicities)
+    if extended_vector is None:
+        extended_vector = extend_knots_vector(
+            order, interval, internal_knots, closed, multiplicities)
 
     return de_Boor(extended_vector, control_net, tabs)
 
@@ -196,41 +198,42 @@ def knot_insertion(t_hat, extended_knots_partition, control_net, order):
     Produces an augmented knots partition and control net.
     """
 
-    n = len(extended_knots_partition) - order
-    augmented_knots_partition = np.zeros((1, 1+len(extended_knots_partition)))
+    n, _ = np.shape(control_net)
+    augmented_knots_partition = np.zeros(1+len(extended_knots_partition))
     
-    r = order-1 # before the inf extrema of interval, namely `a`, it's forbidden
-    while r < len(extended_knots_partition):
+    r = None 
+    # before the inf extrema of interval, namely `a`, it's forbidden
+    for r in range(order-1, len(extended_knots_partition)):
         if extended_knots_partition[r] >= t_hat: break
     assert r <= n+1 # in case t_hat is the same of sup extrema of interval, ie. `b`
 
-    augmented_knots_partition[,r] = extended_knots_partition[,r] 
+    augmented_knots_partition[:r] = extended_knots_partition[:r] 
     augmented_knots_partition[r] = t_hat
-    augmented_knots_partition[r+1,] = extended_knots_partition[r,] 
+    augmented_knots_partition[r+1:] = extended_knots_partition[r:] 
 
-    r -= 1 # index of inf extrema of interval containing `t_hat`
+    #r -= 1 # index of inf extrema of interval containing `t_hat`
 
     def omega(i, s=order):
         knots_slack = extended_knots_partition[i+s-1]-extended_knots_partition[i] 
         hat_difference = t_hat - extended_knots_partition[i]
         return hat_difference / knots_slack if knots_slack > 0 else 0
 
-    omega = np.array(omega(i) for i in range(r-order+2, r+1))
+    omega_vector = np.array([omega(i) for i in range(r-order+2, r+1)])
 
-    combination_matrix = np.eye(n)
+    combination_matrix = np.matrix(np.eye(n))
     o = 0
     for i in range(r-order+2, r+1): # this `for` runs `order-1` times
-        combination_matrix[i-1, i-1] = 1-omega[o]
-        combination_matrix[i-1, i] = omega[o]
+        combination_matrix[i-1, i-1] = 1-omega_vector[o]
+        combination_matrix[i-1, i] = omega_vector[o] 
         o += 1
     assert o == order-1
 
-    first_row = np.zeros(n)
-    first_row[0] = 1
+    first_row = np.zeros((1,n))
+    first_row[0,0] = 1
     combination_matrix = np.concatenate((first_row, combination_matrix), axis=0)
-
+    #print(combination_matrix)
     augmented_control_net = combination_matrix.dot(control_net)
-    
+    #print(augmented_control_net) 
     return augmented_knots_partition, augmented_control_net
 
     
@@ -258,17 +261,23 @@ def sample_internal_knots_uniformly_in(interval, number_of_knots):
         start=a, stop=b, num=number_of_knots+2, endpoint=True)
     return interval_with_extrema[1:-1] # discard the first and the last
 
-def draw(control_net=None, axis="image"):
+def plot_curve(curve, control_net=None, axis="image"):
     """
-    Draw the given curve, saving it in a file if desired.
+    Plot the given curve, against its control net and saving it if desired.
     """
 
     import matplotlib.pyplot as plt
-    plt.plot(control_net[:,0], control_net[:,1], "o--")
+    
+    if control_net is not None:
+        plt.plot(control_net[:,0], control_net[:,1], "o--")
+
+    X, Y = curve[:,0], curve[:,1]
     plt.plot(X, Y)
+
     plt.axis(axis)
-    #plt.ylabel('some numbers')
     plt.show()
+    # saving the image for now will wait
+
 
 def exercise_one():
     """
@@ -292,19 +301,11 @@ def exercise_one():
     curve = draw(order=4, interval=interval, internal_knots=internal_knots, 
                     control_net=control_net, multiplicities=[2,2,2])
 
-
-    X, Y = curve[:,0], curve[:,1]
-
-    #return curve
-
-    import matplotlib.pyplot as plt
-    plt.plot(control_net[:,0], control_net[:,1], "o--")
-    plt.plot(X, Y)
-    plt.axis([-4, 4, 0, 16])
-    plt.ylabel('some numbers')
-    plt.show()
+    plot_curve(curve, control_net, axis=[-4, 4, 0, 16])
 
 
+def close_control_net(control_net, axis=0):
+    return np.concatenate((control_net, control_net[0, :]), axis=axis)
 
 def exercise_two():
     """
@@ -323,27 +324,104 @@ def exercise_two():
                              [1.4, 2]
                              ])
 
-    def close_control_net(control_net=control_net):
-        return np.concatenate((control_net, control_net[0, :]), axis=0)
 
     interval = (0,1)
     internal_knots = sample_internal_knots_uniformly_in(interval, 9)
     curve = draw(order=4, interval=interval, internal_knots=internal_knots, 
                     closed=True, control_net=control_net)
 
-    X, Y = curve[:,0], curve[:,1]
+    plot_curve(curve, close_control_net(control_net), axis=[-4, 4, 0, 16])
 
-    #return curve
+def exercise_three():
+    """
+    This is a simple exercise to plot an open mushroom
+    """
+    control_net = np.matrix([
+                             [-0.2, 2],
+                             [-0.3, 6.2],
+                             [-1.2, 4.8],
+                             [-2.8, 8.8],
+                             [-0.7, 14],
+                             [1.4, 14.7],
+                             [3.6, 10.2],
+                             [3.2, 5.1],
+                             [1.5, 6.2],
+                             [1.4, 2]
+                             ])
 
-    import matplotlib.pyplot as plt
-    control_net = close_control_net()
-    plt.plot(control_net[:,0], control_net[:,1], "o--")
-    plt.plot(X, Y)
-    plt.axis([-4, 4, 0, 16])
-    plt.ylabel('some numbers')
-    plt.show()
+    interval = (0,1)
+    internal_knots = sample_internal_knots_uniformly_in(interval, 6)
+    multiplicities = np.ones(6)
+    order, closed, axis = 4, False, [-4, 4, 0, 16]
+    
+    extended_vector = extend_knots_vector(
+        order, interval, internal_knots, closed, multiplicities)
+
+#   First build the raw curve where each knots has multiplicity 1
+    curve = draw(order=order, interval=interval, internal_knots=internal_knots, 
+                    closed=closed, control_net=control_net, 
+                    multiplicities=multiplicities, extended_vector=extended_vector)
+    plot_curve(curve, control_net, axis=axis)
+
+    n, _ = np.shape(control_net)
+    for knot, m in zip(range(len(internal_knots)), range(len(multiplicities))):
+        while multiplicities[m] < order-2:
+            extended_vector, control_net = knot_insertion(
+                internal_knots[knot], extended_vector, control_net, order)
+            n_new, _ = np.shape(control_net)
+            assert n + 1 == n_new
+            n = n_new
+            multiplicities[m] += 1
+            curve = draw(order=order, interval=interval, internal_knots=internal_knots, 
+                        closed=closed, control_net=control_net, 
+                        multiplicities=multiplicities, extended_vector=extended_vector)
+            plot_curve(curve, control_net, axis=axis)
 
 
+def exercise_four():
+    """
+    This is a simple exercise to plot an open mushroom
+    """
+    control_net = np.matrix([
+                             [-0.2, 2],
+                             [-0.3, 6.2],
+                             [-1.2, 4.8],
+                             [-2.8, 8.8],
+                             [-0.7, 14],
+                             [1.4, 14.7],
+                             [3.6, 10.2],
+                             [3.2, 5.1],
+                             [1.5, 6.2],
+                             [1.4, 2]
+                             ])
+
+    interval = (0,1)
+    internal_knots = [0, 0, 0, 1, 1, 1]
+    multiplicities = np.ones(6)
+    order, closed, axis = 4, False, [-4, 4, 0, 16]
+    
+    extended_vector = extend_knots_vector(
+        order, interval, internal_knots, closed, multiplicities)
+
+#   First build the raw curve where each knots has multiplicity 1
+    curve = draw(order=order, interval=interval, internal_knots=internal_knots, 
+                    closed=closed, control_net=control_net, 
+                    multiplicities=multiplicities, extended_vector=extended_vector)
+    plot_curve(curve, control_net, axis=axis)
+
+    n, _ = np.shape(control_net)
+    for knot, m in zip(range(len(internal_knots)), range(len(multiplicities))):
+        while multiplicities[m] < order-2:
+            extended_vector, control_net = knot_insertion(
+                internal_knots[knot], extended_vector, control_net, order)
+            n_new, _ = np.shape(control_net)
+            assert n + 1 == n_new
+            n = n_new
+            multiplicities[m] += 1
+            curve = draw(order=order, interval=interval, internal_knots=internal_knots, 
+                        closed=closed, control_net=control_net, 
+                        multiplicities=multiplicities, extended_vector=extended_vector)
+            plot_curve(curve, control_net, axis=axis)
 
 
 
