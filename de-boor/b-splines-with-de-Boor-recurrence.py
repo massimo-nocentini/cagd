@@ -203,15 +203,16 @@ def knot_insertion(t_hat, extended_knots_partition, control_net, order):
     
     r = None 
     # before the inf extrema of interval, namely `a`, it's forbidden
-    for r in range(order-1, len(extended_knots_partition)):
-        if extended_knots_partition[r] >= t_hat: break
-    assert r <= n+1 # in case t_hat is the same of sup extrema of interval, ie. `b`
+    #for r in range(order-1, len(extended_knots_partition)):
+    for r in range(order-1, n+1):
+        if t_hat < extended_knots_partition[r]: break
+    #assert r <= n+1 # in case t_hat is the same of sup extrema of interval, ie. `b`
 
     augmented_knots_partition[:r] = extended_knots_partition[:r] 
     augmented_knots_partition[r] = t_hat
     augmented_knots_partition[r+1:] = extended_knots_partition[r:] 
 
-    #r -= 1 # index of inf extrema of interval containing `t_hat`
+    r -= 1 # index of inf extrema of interval containing `t_hat`
 
     def omega(i, s=order):
         knots_slack = extended_knots_partition[i+s-1]-extended_knots_partition[i] 
@@ -281,8 +282,11 @@ def plot_curve(curve, control_net=None, axis="image"):
 
 def exercise_one():
     """
-    This is a simple exercise to plot an open mushroom
+    Simple exercise to plot an open mushroom.
     """
+
+    interval = (0,1)
+
     control_net = np.matrix([
                              [-0.2, 2],
                              [-0.3, 6.2],
@@ -296,10 +300,15 @@ def exercise_one():
                              [1.4, 2],
                              ])
 
-    interval = (0,1)
-    internal_knots = sample_internal_knots_uniformly_in(interval, 3)
-    curve = draw(order=4, interval=interval, internal_knots=internal_knots, 
-                    control_net=control_net, multiplicities=[2,2,2])
+    arguments = {   
+        'order':4, 
+        'interval':interval,
+        'internal_knots':sample_internal_knots_uniformly_in(interval, 3),
+        'control_net':control_net,
+        'multiplicities':[2,2,2]
+    }
+
+    curve = draw(**arguments)
 
     plot_curve(curve, control_net, axis=[-4, 4, 0, 16])
 
@@ -311,6 +320,9 @@ def exercise_two():
     """
     This is a simple exercise to plot an open mushroom
     """
+    
+    interval = (0,1)
+
     control_net = np.matrix([
                              [-0.2, 2],
                              [-0.3, 6.2],
@@ -324,13 +336,18 @@ def exercise_two():
                              [1.4, 2]
                              ])
 
+    arguments = {   
+        'order':4, 
+        'interval':interval,
+        'internal_knots':sample_internal_knots_uniformly_in(interval, 9),
+        'control_net':control_net,
+        'closed':True
+    }
 
-    interval = (0,1)
-    internal_knots = sample_internal_knots_uniformly_in(interval, 9)
-    curve = draw(order=4, interval=interval, internal_knots=internal_knots, 
-                    closed=True, control_net=control_net)
+    curve = draw(**arguments)
 
     plot_curve(curve, close_control_net(control_net), axis=[-4, 4, 0, 16])
+
 
 def exercise_three():
     """
