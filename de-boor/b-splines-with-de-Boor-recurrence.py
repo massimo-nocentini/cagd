@@ -219,22 +219,13 @@ def knot_insertion(t_hat, extended_knots_partition, control_net, order):
         hat_difference = t_hat - extended_knots_partition[i]
         return hat_difference / knots_slack if knots_slack > 0 else 0
 
-    omega_vector = np.array([omega(i) for i in range(r-order+2, r+1)])
+    combination_matrix = np.zeros((n+1,n))
 
-    combination_matrix = np.matrix(np.eye(n))
-    o = 0
-    for i in range(r-order+2, r+1): # this `for` runs `order-1` times
-        combination_matrix[i-1, i-1] = 1-omega_vector[o]
-        combination_matrix[i-1, i] = omega_vector[o] 
-        o += 1
-    assert o == order-1
+    for i in range(0, r-order+2):   combination_matrix[i,i] = 1
+    for i in range(r-order+2, r+1): o = omega(i); combination_matrix[i,i-1:i+1] = [1-o, o] 
+    for i in range(r+1, n+1):   combination_matrix[i,i-1] = 1
 
-    first_row = np.zeros((1,n))
-    first_row[0,0] = 1
-    combination_matrix = np.concatenate((first_row, combination_matrix), axis=0)
-    #print(combination_matrix)
     augmented_control_net = combination_matrix.dot(control_net)
-    #print(augmented_control_net) 
     return augmented_knots_partition, augmented_control_net
 
     
