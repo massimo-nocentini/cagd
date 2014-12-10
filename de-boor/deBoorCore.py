@@ -93,32 +93,6 @@ def extend_knots_vector(order, interval, internal_knots, closed=False, multiplic
 
     return closed_case() if closed else open_case()
         
-def draw(order, interval, internal_knots, control_net, 
-            tabs=None, points=1000, closed=False, 
-            multiplicities=None, extended_vector=None):
-    """
-    Produces a set of point representing the BSpline interpolation of the given control net.
-    """
-
-    if multiplicities is None:
-        multiplicities = np.repeat(1, len(internal_knots))
-
-    n, d = np.shape(control_net)
-    if closed:
-        assert n == order + sum(multiplicities) - order + 1
-        control_net = np.concatenate((control_net, control_net[:order-1, :]), axis=0)
-    else:
-        assert n == order + sum(multiplicities)
-
-    if tabs is None:
-        a, b = interval
-        tabs = np.linspace(start=a, stop=b, num=points*(b-a))
-
-    if extended_vector is None:
-        extended_vector = extend_knots_vector(
-            order, interval, internal_knots, closed, multiplicities)
-
-    return de_Boor(extended_vector, control_net, tabs)
 
 def de_Boor(extended_knots_partition, control_net, tabs): 
     """
@@ -226,228 +200,25 @@ def knot_insertion(t_hat, extended_knots_partition, control_net, order):
     for i in range(r+1, n+1):   combination_matrix[i,i-1] = 1
 
     augmented_control_net = combination_matrix.dot(control_net)
+
     return augmented_knots_partition, augmented_control_net
 
-    
 
-
-def sample_internal_knots_uniformly_in(interval, number_of_knots):
+def raise_internal_knots_to_max_smooth(
+        order, internal_knots, multiplicities, extended_vector, control_net, on_each_rising):
     """
-    Returns an numpy array containing internal knots uniformly placed.
-
-    This function is useful to generate a partion of `internal` knots
-    to be paired with desired multiplicities. It is implemented to be
-    used by `client` functions written by users.
-
-    Simple example sampling from (0,1) segment:
-    >>> sample_internal_knots_uniformly_in(interval=(0,1), number_of_knots=3)
-    array([ 0.25,  0.5 ,  0.75])
-
-    Another simple test:
-    >>> sample_internal_knots_uniformly_in(interval=(0,11), number_of_knots=10)
-    array([  1.,   2.,   3.,   4.,   5.,   6.,   7.,   8.,   9.,  10.])
+    Functional that raise each internal knot to max smoothness calling the given handler at each step.
     """
-
-    a, b = interval
-    interval_with_extrema = np.linspace(
-        start=a, stop=b, num=number_of_knots+2, endpoint=True)
-    return interval_with_extrema[1:-1] # discard the first and the last
-
-def plot_curve(curve, control_net=None, axis="image"):
-    """
-    Plot the given curve, against its control net and saving it if desired.
-    """
-
-    import matplotlib.pyplot as plt
-    
-    if control_net is not None:
-        plt.plot(control_net[:,0], control_net[:,1], "o--")
-
-    X, Y = curve[:,0], curve[:,1]
-    plt.plot(X, Y)
-
-    plt.axis(axis)
-    plt.show()
-    # saving the image for now will wait
-
-
-def exercise_one():
-    """
-    Simple exercise to plot an open mushroom.
-    """
-
-    interval = (0,1)
-
-    control_net = np.matrix([
-                             [-0.2, 2],
-                             [-0.3, 6.2],
-                             [-1.2, 4.8],
-                             [-2.8, 8.8],
-                             [-0.7, 14],
-                             [1.4, 14.7],
-                             [3.6, 10.2],
-                             [3.2, 5.1],
-                             [1.5, 6.2],
-                             [1.4, 2],
-                             ])
-
-    arguments = {   
-        'order':4, 
-        'interval':interval,
-        'internal_knots':sample_internal_knots_uniformly_in(interval, 3),
-        'control_net':control_net,
-        'multiplicities':[2,2,2]
-    }
-
-    curve = draw(**arguments)
-
-    plot_curve(curve, control_net, axis=[-4, 4, 0, 16])
-
-
-def close_control_net(control_net, axis=0):
-    return np.concatenate((control_net, control_net[0, :]), axis=axis)
-
-def exercise_two():
-    """
-    This is a simple exercise to plot an open mushroom
-    """
-    
-    interval = (0,1)
-
-    control_net = np.matrix([
-                             [-0.2, 2],
-                             [-0.3, 6.2],
-                             [-1.2, 4.8],
-                             [-2.8, 8.8],
-                             [-0.7, 14],
-                             [1.4, 14.7],
-                             [3.6, 10.2],
-                             [3.2, 5.1],
-                             [1.5, 6.2],
-                             [1.4, 2]
-                             ])
-
-    arguments = {   
-        'order':4, 
-        'interval':interval,
-        'internal_knots':sample_internal_knots_uniformly_in(interval, 9),
-        'control_net':control_net,
-        'closed':True
-    }
-
-    curve = draw(**arguments)
-
-    plot_curve(curve, close_control_net(control_net), axis=[-4, 4, 0, 16])
-
-
-def exercise_three():
-    """
-    This is a simple exercise to plot an open mushroom
-    """
-    control_net = np.matrix([
-                             [-0.2, 2],
-                             [-0.3, 6.2],
-                             [-1.2, 4.8],
-                             [-2.8, 8.8],
-                             [-0.7, 14],
-                             [1.4, 14.7],
-                             [3.6, 10.2],
-                             [3.2, 5.1],
-                             [1.5, 6.2],
-                             [1.4, 2]
-                             ])
-
-    interval = (0,1)
-    internal_knots = sample_internal_knots_uniformly_in(interval, 6)
-    multiplicities = np.ones(6)
-    order, closed, axis = 4, False, [-4, 4, 0, 16]
-    
-    extended_vector = extend_knots_vector(
-        order, interval, internal_knots, closed, multiplicities)
-
-#   First build the raw curve where each knots has multiplicity 1
-    curve = draw(order=order, interval=interval, internal_knots=internal_knots, 
-                    closed=closed, control_net=control_net, 
-                    multiplicities=multiplicities, extended_vector=extended_vector)
-    plot_curve(curve, control_net, axis=axis)
 
     n, _ = np.shape(control_net)
     for knot, m in zip(range(len(internal_knots)), range(len(multiplicities))):
         while multiplicities[m] < order-2:
             extended_vector, control_net = knot_insertion(
                 internal_knots[knot], extended_vector, control_net, order)
-            n_new, _ = np.shape(control_net)
-            assert n + 1 == n_new
-            n = n_new
+
             multiplicities[m] += 1
-            curve = draw(order=order, interval=interval, internal_knots=internal_knots, 
-                        closed=closed, control_net=control_net, 
-                        multiplicities=multiplicities, extended_vector=extended_vector)
-            plot_curve(curve, control_net, axis=axis)
 
+            on_each_rising(multiplicities, extended_vector, control_net) 
 
-def exercise_four():
-    """
-    This is a simple exercise to plot an open mushroom
-    """
-    control_net = np.matrix([
-                             [-0.2, 2],
-                             [-0.3, 6.2],
-                             [-1.2, 4.8],
-                             [-2.8, 8.8],
-                             [-0.7, 14],
-                             [1.4, 14.7],
-                             [3.6, 10.2],
-                             [3.2, 5.1],
-                             [1.5, 6.2],
-                             [1.4, 2]
-                             ])
-
-    interval = (0,1)
-    internal_knots = [0, 0, 0, 1, 1, 1]
-    multiplicities = np.ones(6)
-    order, closed, axis = 4, False, [-4, 4, 0, 16]
-    
-    extended_vector = extend_knots_vector(
-        order, interval, internal_knots, closed, multiplicities)
-
-#   First build the raw curve where each knots has multiplicity 1
-    curve = draw(order=order, interval=interval, internal_knots=internal_knots, 
-                    closed=closed, control_net=control_net, 
-                    multiplicities=multiplicities, extended_vector=extended_vector)
-    plot_curve(curve, control_net, axis=axis)
-
-    n, _ = np.shape(control_net)
-    for knot, m in zip(range(len(internal_knots)), range(len(multiplicities))):
-        while multiplicities[m] < order-2:
-            extended_vector, control_net = knot_insertion(
-                internal_knots[knot], extended_vector, control_net, order)
-            n_new, _ = np.shape(control_net)
-            assert n + 1 == n_new
-            n = n_new
-            multiplicities[m] += 1
-            curve = draw(order=order, interval=interval, internal_knots=internal_knots, 
-                        closed=closed, control_net=control_net, 
-                        multiplicities=multiplicities, extended_vector=extended_vector)
-            plot_curve(curve, control_net, axis=axis)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#   this function doesn't return `internal_knots` since it doesn't change
+    return multiplicities, extended_vector, control_net 
