@@ -353,8 +353,8 @@ function exercise_polar()
     j = 1
     for i=linspace(0,1,params)
         derivativePoints[j,:] = derivative(differencePoints,i)
-	aPoint, Diagonal, Last = decasteljau(controlPoints, i)
-	bezierPoints[j,:] = aPoint
+        aPoint, Diagonal, Last = decasteljau(controlPoints, i)
+        bezierPoints[j,:] = aPoint
         ## polarPoints[j,:] = aPoint + ((0.4 - i)/n)*derivativePoints[j,:]
         polarPoints[j,:] = polar(controlPoints, i, 0.4)
         j += 1

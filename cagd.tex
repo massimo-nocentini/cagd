@@ -5,7 +5,7 @@
 %\usepackage{inputenc}
 \usepackage[T1]{fontenc} 
 \usepackage[square,numbers]{natbib} 
-\usepackage{amsmath, amsthm, amssymb, tikz}
+\usepackage{amsmath, amsthm, amssymb, amsfonts, tikz}
 \usetikzlibrary{snakes}
 % \newtheorem{definizione}{Definizione}  
 % \newtheorem{lemma}{Lemma}
@@ -271,7 +271,7 @@ those Bezier curves in the same plot and each one is over the others).
   \label{fig:increasing-degree-does-change-curve}
 \end{figure}
 
-
+\subsection{Joining curve requiring $\mathcal{C}^0, \mathcal{C}^1, \mathcal{C}^2$}
 
 \includegraphics{bezier-deCasteljau-curves/exercise-seven-continuity}
 \includegraphics{bezier-deCasteljau-curves/exercise-seven-tangent}
@@ -281,6 +281,61 @@ those Bezier curves in the same plot and each one is over the others).
 \includegraphics{bezier-deCasteljau-curves/exercise-seven-tangent-left}
 \includegraphics{bezier-deCasteljau-curves/exercise-seven-obsculating-left}
 \includegraphics{bezier-deCasteljau-curves/exercise-seven-a_i-left}
+
+\subsection{First Polar of a Bezier curve}
+
+In this section we elaborate an extra exercise relative to first derivative
+of a Bezier curve and the first step of de Casteljau algorithm. 
+
+Let $\mathbf{p}_{1}(t)$ a Bezier curve built over a control net with $n$ points
+$\mathbf{b}_{0}^{(1)},\ldots,\mathbf{b}_{n-1}^{(1)}$, respect a fixed parameter $\hat{t}$
+after one step of de Casteljau algorithm. Just use the formal definition:
+\begin{displaymath}
+    \begin{split}
+        \mathbf{p}_{1,\hat{t}}(t)  &= \sum_{i=0}^{n-1}{\mathbf{b}_{i}^{(1)}(\hat{t})B_{i}^{n-1}(t)} \\
+            &=  \sum_{i=0}^{n-1}{\left( (1-\hat{t})\mathbf{b}_{i}^{(0)} + 
+                \hat{t}\mathbf{b}_{i+1}^{(0)}\right)B_{i}^{n-1}(t)} \\
+            &=  \sum_{i=0}^{n-1}{\left( (1-\hat{t})\mathbf{b}_{i}^{(0)} + 
+                \hat{t}\mathbf{b}_{i+1}^{(0)} -\left( (1-t)\mathbf{b}_{i}^{(0)} + 
+                t\mathbf{b}_{i+1}^{(0)}\right)\right)B_{i}^{n-1}(t)} + 
+                \sum_{i=0}^{n-1}{\mathbf{b}_{i}^{(1)}(t)B_{i}^{n-1}(t)} \\
+            &=  \sum_{i=0}^{n-1}{\left( (t-\hat{t})\mathbf{b}_{i}^{(0)} + 
+                (\hat{t}-t)\mathbf{b}_{i+1}^{(0)}\right)B_{i}^{n-1}(t)} + 
+                \sum_{i=0}^{n-1}{\mathbf{b}_{i}^{(1)}(t)B_{i}^{n-1}(t)} \\
+            &=  (\hat{t}-t)\sum_{i=0}^{n-1}{\left( 
+                \mathbf{b}_{i+1}^{(0)} - \mathbf{b}_{i}^{(0)}\right)B_{i}^{n-1}(t)} + 
+                \sum_{i=0}^{n-1}{\mathbf{b}_{i}^{(1)}(t)B_{i}^{n-1}(t)} \\
+    \end{split}
+\end{displaymath}
+where, with little abuse of notation, $\mathbf{b}_{i}^{(1)}(t) = 
+\left( (1-t)\mathbf{b}_{i}^{(0)} + t\mathbf{b}_{i+1}^{(0)}\right)$.
+Recall that $n\sum_{i=0}^{n-1}{\left( 
+\mathbf{b}_{i+1}^{(0)} - \mathbf{b}_{i}^{(0)}\right)B_{i}^{n-1}(t)}$ is the
+first derivative of a Bezier curve, hence:
+\begin{displaymath}
+    \begin{split}
+        \mathbf{p}_{1, \hat{t}}(t)  &= \mathbf{b}_{1, t}(t) + 
+        \frac{\hat{t}-t}{n}\frac{\partial \mathbf{b}_{0, \hat{t}}(t) }{\partial t} 
+    \end{split}
+\end{displaymath}
+So, this is called the ``first polar form'' of Bezier curve $\mathbf{b}_{0, \hat{t}}(t)$
+respect parameter $\hat{t}$. Geometrically, the term $\mathbf{b}_{1, t}(t)$ is an affine
+combination of points $\mathbf{b}_{0}^{(0)},\ldots,\mathbf{b}_{n}^{(0)}$ respect parameter
+$t$ (not $\hat{t}$), hence it is a point also; the term 
+        $\frac{\hat{t}-t}{n}\frac{\partial \mathbf{b}_{0, \hat{t}}(t) }{\partial t} $
+is a vector, so $\mathbf{p}_{1, \hat{t}}(t)$ is a vector applied to a point, yielding a point
+as required. It is quite interesting how the polar form combine a point produced using $t$
+as parameter with the derivative vector produced using  parameter $\hat{t}$. This derivation
+comes from \cite{Farin}, page 73, and we report the output of our implementation in
+\autoref{fig:exercise-polar-form}.
+\begin{figure}
+  \centering
+  \includegraphics{bezier-deCasteljau-curves/exercise-polar}
+  \caption{Polar form of a Bezier curve}
+  \label{fig:exercise-polar-form}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{B-Splines}
 
@@ -379,9 +434,8 @@ those Bezier curves in the same plot and each one is over the others).
 \bibitem{Julia} Open Source Project,
   \emph{Julia language}, \url{http://julialang.org/}
 
-\bibitem{ETH} Locher T., Y. A. Pignolet, R. Wattenhofer,
-  \textit{Principles of Distribuited Computing}, Zurich, Swiss Federal
-  Institute of Technology, 2013.
+\bibitem{Farin} Gerald Farin,
+  \textit{Curves and surfaces for CAGD, Fifth Edition}
 
 
 \end{thebibliography}
