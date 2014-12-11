@@ -47,12 +47,7 @@ def extend_knots_vector(order, interval, internal_knots, closed=False, multiplic
     # unpacking the interval extrema
     a, b = interval
     
-    # The following could be another way destructure the partition but it is less clear
-    # how to distinguish an empty partition (ie. [a, b]) from a filled one.
-    # a, *internal_knots, b = internal_knots
-    
-    if multiplicities is None:
-        multiplicities = np.repeat(1, len(internal_knots))
+    if multiplicities is None: multiplicities = np.repeat(1, len(internal_knots))
 
     assert len(internal_knots) == len(multiplicities)
 
@@ -167,6 +162,7 @@ def de_Boor(extended_knots_partition, control_net, tabs):
 
     return C.transpose()
 
+
 def knot_insertion(t_hat, extended_knots_partition, control_net, order):
     """
     Produces an augmented knots partition and control net.
@@ -176,11 +172,10 @@ def knot_insertion(t_hat, extended_knots_partition, control_net, order):
     augmented_knots_partition = np.zeros(1+len(extended_knots_partition))
     
     r = None 
-    # before the inf extrema of interval, namely `a`, it's forbidden
-    #for r in range(order-1, len(extended_knots_partition)):
-    for r in range(order-1, n+1):
+#   Before the inf extrema of interval, namely `a`, it's forbidden
+#   It is also forbidden beyond the sup extrema, namely `b`.
+    for r in range(order-1, n+1): 
         if t_hat < extended_knots_partition[r]: break
-    #assert r <= n+1 # in case t_hat is the same of sup extrema of interval, ie. `b`
 
     augmented_knots_partition[:r] = extended_knots_partition[:r] 
     augmented_knots_partition[r] = t_hat
@@ -208,17 +203,31 @@ def raise_internal_knots_to_max_smooth(
         order, internal_knots, multiplicities, extended_vector, control_net, on_each_rising):
     """
     Functional that raise each internal knot to max smoothness calling the given handler at each step.
+
+    It keeps applying the knot insertion algorithm on each internal knot until its multiplicity
+    gets `order-2`, the max request for smoothness.
+
+    It returns a list of tuples, containing a tuple of multiplicities, extended_vector and control_net
+    at each rising step. Observe that this function doesn't return the internal knots partition
+    since it doesn't change because only multiplicities of knots already there are raised.
     """
 
-    n, _ = np.shape(control_net)
+    steps = []
+
     for knot, m in zip(range(len(internal_knots)), range(len(multiplicities))):
         while multiplicities[m] < order-2:
+
             extended_vector, control_net = knot_insertion(
                 internal_knots[knot], extended_vector, control_net, order)
 
             multiplicities[m] += 1
 
-            on_each_rising(multiplicities, extended_vector, control_net) 
+            current_step = [multiplicities, extended_vector, control_net]
 
-#   this function doesn't return `internal_knots` since it doesn't change
-    return multiplicities, extended_vector, control_net 
+            steps.append(current_step) 
+
+            on_each_rising(*current_step) 
+
+    return steps
+
+

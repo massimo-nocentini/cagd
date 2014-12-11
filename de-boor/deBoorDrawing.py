@@ -22,10 +22,10 @@ def draw(order, interval, internal_knots, control_net,
     knots partition using `extend_knots_vector` function.
     """
 
-    if multiplicities is None:
-        multiplicities = np.repeat(1, len(internal_knots))
+    if multiplicities is None: multiplicities = np.ones(len(internal_knots))
 
     n, d = np.shape(control_net)
+
     if closed:
         assert n == order + sum(multiplicities) - order + 1
         control_net = np.concatenate((control_net, control_net[:order-1, :]), axis=0)
@@ -62,6 +62,9 @@ def plot_curve(curve, control_net=None, axis="image"):
 
 
 def close_control_net(control_net, axis=0):
+    """
+    Close an open control_net.
+    """
     return np.concatenate((control_net, control_net[0, :]), axis=axis)
 
 
