@@ -1,3 +1,0 @@
-
-from deBoorDrawing import * 
-
