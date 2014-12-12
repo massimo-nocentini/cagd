@@ -200,46 +200,40 @@ def knot_insertion(t_hat, extended_knots_partition, control_net, order):
 
 
 def raise_internal_knots_to_max_smooth(
-        order, internal_knots, multiplicities, extended_vector, control_net):
+        order, internal_knots, multiplicities, extended_vector, 
+        control_net, fix_extended_vector, closed=False):
     """
-    Functional that raise each internal knot to max smoothness calling the given handler at each step.
+    Generator that raise each internal knot to max smoothness.
 
-    It keeps applying the knot insertion algorithm on each internal knot until its multiplicity
-    gets `order-2`, the max request for smoothness.
+    It keeps applying the knot insertion algorithm on each internal knot 
+    until its multiplicity gets `order-2`, the max request for smoothness.
 
-    It returns a list of tuples, containing a tuple of multiplicities, extended_vector and control_net
-    at each rising step. Observe that this function doesn't return the internal knots partition
-    since it doesn't change because only multiplicities of knots already there are raised.
+    It is a generator of tuples, where each tuple consists of multiplicities, 
+    extended_vector and control_net at each rising step. Observe that 
+    internal knots partition argument isn't returned since it doesn't 
+    change because only multiplicities of knots already there are raised.
     """
 
-    steps = []
+    if closed: control_net = np.concatenate((control_net, control_net[:order-1, :]), axis=0)
 
-    control_net = np.concatenate((control_net, control_net[:order-1, :]), axis=0)
     for knot, m in zip(range(len(internal_knots)), range(len(multiplicities))):
 
         while multiplicities[m] < order-2:
 
             extended_vector, control_net = knot_insertion(
                 internal_knots[knot], extended_vector, control_net, order)
-                #np.concatenate((control_net, control_net[:order-1, :]), axis=0), order)
 
             multiplicities[m] += 1
 
-            if knot != len(internal_knots)-1:
-                control_net[-(order-1):, :] = control_net[:order-1, :]
-            else:
-                control_net[:order-1, :] = control_net[-(order-1):, :]
+            if closed:
+#               First fix the extended partion to restore cyclic property
+                extended_vector = fix_extended_vector(multiplicities)
 
-            def knot_partition_updater (new_extended_vector): 
-                extended_vector = new_extended_vector
+#               Second, fix control net tail part to be a cyclic repetition of the head
+                if knot != len(internal_knots)-1:
+                    control_net[-(order-1):, :] = control_net[:order-1, :]
+                else:
+                    control_net[:order-1, :] = control_net[-(order-1):, :]
 
-            #current_step = multiplicities, extended_vector, control_net[:-(order-1),:], knot_partition_updater
-            current_step = multiplicities, extended_vector, control_net, knot_partition_updater
-
-            yield current_step
-
-            steps.append(current_step[:-1]) 
-
-    #return steps
-
+            yield multiplicities, extended_vector, control_net
 
