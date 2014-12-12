@@ -200,7 +200,7 @@ def knot_insertion(t_hat, extended_knots_partition, control_net, order):
 
 
 def raise_internal_knots_to_max_smooth(
-        order, internal_knots, multiplicities, extended_vector, control_net, on_each_rising):
+        order, internal_knots, multiplicities, extended_vector, control_net):
     """
     Functional that raise each internal knot to max smoothness calling the given handler at each step.
 
@@ -214,20 +214,32 @@ def raise_internal_knots_to_max_smooth(
 
     steps = []
 
+    control_net = np.concatenate((control_net, control_net[:order-1, :]), axis=0)
     for knot, m in zip(range(len(internal_knots)), range(len(multiplicities))):
+
         while multiplicities[m] < order-2:
 
             extended_vector, control_net = knot_insertion(
                 internal_knots[knot], extended_vector, control_net, order)
+                #np.concatenate((control_net, control_net[:order-1, :]), axis=0), order)
 
             multiplicities[m] += 1
 
-            current_step = [multiplicities, extended_vector, control_net]
+            if knot != len(internal_knots)-1:
+                control_net[-(order-1):, :] = control_net[:order-1, :]
+            else:
+                control_net[:order-1, :] = control_net[-(order-1):, :]
 
-            steps.append(current_step) 
+            def knot_partition_updater (new_extended_vector): 
+                extended_vector = new_extended_vector
 
-            on_each_rising(*current_step) 
+            #current_step = multiplicities, extended_vector, control_net[:-(order-1),:], knot_partition_updater
+            current_step = multiplicities, extended_vector, control_net, knot_partition_updater
 
-    return steps
+            yield current_step
+
+            steps.append(current_step[:-1]) 
+
+    #return steps
 
 

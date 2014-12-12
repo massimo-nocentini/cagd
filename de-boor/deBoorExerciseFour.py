@@ -40,7 +40,9 @@ def exercise_four():
     curve = draw(**arguments)
     plot_curve(curve, close_control_net(control_net), axis=axis)
 
-    def plot_raising_step(multiplicities, extended_vector, control_net):
+    def plot_raising_step(multiplicities, extended_vector, control_net, knot_partition_updater):
+        extended_vector = extend_knots_vector(
+            order, interval, internal_knots, closed, multiplicities)
         arguments = {
             "order":order,
             "interval":interval,
@@ -50,12 +52,14 @@ def exercise_four():
             "multiplicities":multiplicities,
             "extended_vector":extended_vector
         }
+        print(control_net)
         curve = draw(**arguments)
-        plot_curve(curve, close_control_net(control_net), axis=axis)
+        plot_curve(curve, control_net, axis=axis)
+        knot_partition_updater(extended_vector)
         
-    raise_internal_knots_to_max_smooth(
-        order, internal_knots, multiplicities, extended_vector, 
-        control_net, on_each_rising=plot_raising_step)
+    for step in raise_internal_knots_to_max_smooth(
+                    order, internal_knots, multiplicities, extended_vector, control_net):
+        plot_raising_step(*step)
 
 #________________________________________________________________________
 exercise_four()

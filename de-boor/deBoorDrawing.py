@@ -27,8 +27,9 @@ def draw(order, interval, internal_knots, control_net,
     n, d = np.shape(control_net)
 
     if closed:
-        assert n == order + sum(multiplicities) - order + 1
-        control_net = np.concatenate((control_net, control_net[:order-1, :]), axis=0)
+        if n == sum(multiplicities) + 1: 
+            assert n == order + sum(multiplicities) - order + 1
+            control_net = np.concatenate((control_net, control_net[:order-1, :]), axis=0)
     else:
         assert n == order + sum(multiplicities)
 
