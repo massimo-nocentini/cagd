@@ -39,7 +39,7 @@ def exercise_three():
 #   First build the raw curve where each knots has multiplicity 1
     curve = draw(**arguments)
     plot_curve(curve, control_net, axis=axis)
-
+        
     def plot_raising_step(multiplicities, extended_vector, control_net):
         arguments = {
             "order":order,
@@ -52,10 +52,12 @@ def exercise_three():
         }
         curve = draw(**arguments)
         plot_curve(curve, control_net, axis=axis)
-        
-    raise_internal_knots_to_max_smooth(
-        order, internal_knots, multiplicities, extended_vector, 
-        control_net, on_each_rising=plot_raising_step)
+
+    steps = raise_internal_knots_to_max_smooth(
+                order, internal_knots, multiplicities, 
+                extended_vector, control_net, closed)
+
+    for step in steps: plot_raising_step(*step)
 
 #________________________________________________________________________
 exercise_three()

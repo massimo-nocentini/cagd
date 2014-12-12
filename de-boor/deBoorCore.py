@@ -198,10 +198,9 @@ def knot_insertion(t_hat, extended_knots_partition, control_net, order):
 
     return augmented_knots_partition, augmented_control_net
 
-
 def raise_internal_knots_to_max_smooth(
-        order, internal_knots, multiplicities, extended_vector, 
-        control_net, fix_extended_vector, closed=False):
+        order, internal_knots, multiplicities, extended_vector, control_net, 
+        fix_extended_vector=lambda extended_vector: extended_vector, closed=False):
     """
     Generator that raise each internal knot to max smoothness.
 
