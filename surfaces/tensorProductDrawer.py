@@ -9,8 +9,6 @@ def draw(surface_point_maker, figure_size_tuple=(10,10), squares_per_dim=20, sho
     sizex, sizey = figure_size_tuple
     matplotlib.rcParams['figure.figsize'] = [sizex, sizey]
 
-    fig = plt.figure()
-    ax = fig.gca(projection='3d')
 
     squares_per_dim *= 10
 
@@ -26,8 +24,21 @@ def draw(surface_point_maker, figure_size_tuple=(10,10), squares_per_dim=20, sho
     SY = sy.reshape(X.shape)
     SZ = sz.reshape(X.shape)
 
-    surf = ax.plot_surface(SX, SY, SZ, antialiased=True)
+    surf = drawer(lambda ax: ax.plot_surface(SX, SY, SZ, antialiased=True), show_figure)
 
+#   Maybe the following could be factored better about `zdir`
+    xcontour = drawer(lambda ax: ax.contour(SX, SY, SZ, zdir='x', antialiased=True), show_figure)
+    ycontour = drawer(lambda ax: ax.contour(SX, SY, SZ, zdir='y', antialiased=True), show_figure)
+    zcontour = drawer(lambda ax: ax.contour(SX, SY, SZ, zdir='z', antialiased=True), show_figure)
+
+    return surf, xcontour, ycontour, zcontour
+
+def drawer(plotter, show_figure=True):
+    """
+    Produce a plot on a newly created figure, showing it if desired.
+    """
+    fig = plt.figure()
+    ax = fig.gca(projection='3d')
+    plot = plotter(ax)
     if show_figure: plt.show()
-
-    return surf
+    return plot
