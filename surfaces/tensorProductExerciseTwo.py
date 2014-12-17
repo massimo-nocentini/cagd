@@ -28,9 +28,9 @@ def exercise_two():
                             [b30,b31,b32, b33]], 
                             dtype="float")
 
-    surface_maker = lambda params: tpc.de_casteljau_surface(params, control_net)
+    surface = tpc.naive_de_casteljau(control_net)
 
-    tpd.draw(surface_maker)
+    tpd.draw(*surface)
 
 
 #________________________________________________________________________
