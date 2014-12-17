@@ -96,10 +96,12 @@ def naive_de_casteljau(control_net, tabs=None, squares_per_dim=20):
 
     return surface, X.shape
 
-def vectorized_de_casteljau(control_net, tabs=None, breaks=100):
+def vectorized_de_casteljau(control_net, tabs=None, breaks=20):
     """
     Vectorized implementation of de Casteljau algorithm.
     """
+
+    breaks *= 10
 
     if tabs is None: 
         tabs = np.linspace(0,1, breaks), np.linspace(0,1, breaks)
@@ -114,8 +116,6 @@ def vectorized_de_casteljau(control_net, tabs=None, breaks=100):
     mtab, ntab = len(u_tab), len(v_tab)
     u_tab, v_tab = np.meshgrid(u_tab, v_tab) 
     shape = u_tab.shape
-    print(u_tab, u_tab.shape)
-    #u_tab, v_tab = u_tab.reshape((mtab, 1)), v_tab.reshape((ntab, 1))
     u_tm, v_tm = 1-u_tab, 1-v_tab
 
     surface = np.zeros((mtab, ntab, d, rows, cols))
@@ -139,4 +139,8 @@ def vectorized_de_casteljau(control_net, tabs=None, breaks=100):
                             for i in range(rows-r) 
                                 for j in range(cols-r) ]
 
-    return surface[:, :, :, 0, 0], shape
+    #print(surface[:, :, :, 0, 0].shape)
+    surface = np.array([surface[i,j,:, 0, 0] for i in range(breaks) for j in range(breaks)])
+    #print(surface.shape)
+    #return surface[:, :, :, 0, 0], shape
+    return surface, shape
