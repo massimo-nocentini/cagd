@@ -120,10 +120,14 @@ def vectorized_de_casteljau(control_net, tabs=None, breaks=20):
 
     surface = np.zeros((mtab, ntab, d, rows, cols))
 
-    def initialize(it, jt, i_d): surface[it, jt, i_d, :, :] = control_net[:, :, i_d]
-    [initialize(it, jt, i_d) for it in range(mtab) for jt in range(ntab) for i_d in range(d)]
+    def initialize(it, jt, i_d): 
+        surface[it, jt, i_d, :, :] = control_net[:, :, i_d]
 
-    def update(i_d, i, j): 
+    [initialize(it, jt, i_d)    for it in range(mtab) 
+                                for jt in range(ntab) 
+                                for i_d in range(d)]
+
+    def update_square(i_d, i, j): 
         uv_tm_tm = np.multiply(u_tm, v_tm)
         uv_tm_tab = np.multiply(u_tm, v_tab)
         uv_tab_tm = np.multiply(u_tab, v_tm)
@@ -134,13 +138,32 @@ def vectorized_de_casteljau(control_net, tabs=None, breaks=20):
                 + np.multiply(uv_tab_tm, surface[:, :, i_d, i+1, j])
                 + np.multiply(uv_tab_tab, surface[:, :, i_d, i+1, j+1]))
     
-    [update(i_d, i, j)  for i_d in range(d)
-                        for r in range(1, k) 
-                            for i in range(rows-r) 
-                                for j in range(cols-r) ]
+#   Combine in square block as much as `k` allow
+    for s in range(1, k): 
+        [update_square(i_d, i, j)   for i_d in range(d) 
+                                    for i in range(rows-s) 
+                                    for j in range(cols-s) ]
 
-    #print(surface[:, :, :, 0, 0].shape)
-    surface = np.array([surface[i,j,:, 0, 0] for i in range(breaks) for j in range(breaks)])
-    #print(surface.shape)
-    #return surface[:, :, :, 0, 0], shape
+    def update_along_u(i_d, i): 
+        surface[:, :, i_d, i, 0] = (np.multiply(u_tm, surface[:, :, i_d, i, 0]) + 
+                np.multiply(u_tab, surface[:, :, i_d, i+1, 0]))
+    
+#   Complete combining along `u` direction if any
+    for r in range(rows-k):
+        [update_along_u(i_d, i) for i_d in range(d) 
+                                for i in range(rows-k-r)] 
+
+    def update_along_v(i_d, j): 
+        surface[:, :, i_d, 0, j] = (np.multiply(v_tm, surface[:, :, i_d, 0, j]) + 
+                np.multiply(v_tab, surface[:, :, i_d, 0, j+1]))
+
+#   Complete combining along `v` direction if any
+    for c in range(cols-k):
+        [update_along_v(i_d, j) for i_d in range(d) 
+                                for j in range(cols-k-c)] 
+
+#   Clean parameterization values away from `surface` structure 
+    surface = np.array([surface[i,j,:, 0, 0]    for i in range(mtab) 
+                                                for j in range(ntab)])
+
     return surface, shape
