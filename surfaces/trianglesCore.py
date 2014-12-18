@@ -21,8 +21,12 @@ def u_bar(ntab):
     U       baricentric coordinates matrix of dimension `3x((ntab+1)*(ntab+2)/2)`
     """
 
-    multi_indeces = (ntab+1)*(ntab+2)/2
-    points_on_each_segment = ntab+1
+#   observe that it is always possible to halve the next quantity, 
+#   since if `ntab` is odd then `ntab+1` is even, and if `ntab` 
+#   is even then `ntab+2` is even too, hence both are divisible by 2.
+    multi_indeces = (ntab+1)*(ntab+2)/2 
+
+    # points_on_each_segment = ntab+1
 
     U = np.empty((3, multi_indeces))
     tri = np.empty((ntab^2, 3))
@@ -57,6 +61,57 @@ def u_bar(ntab):
     count += 1
 #   Maybe in the following indeces we should subtract 1 if they are used to index matrix U
     tri[count,:] = np.array([multi_indeces-2, multi_indeces-1, multi_indeces])
+
     assert count == ntab^2 - 1
 
     return tri, U
+
+
+def de_casteljau(order, control_net, ntab, V=None):
+    """
+    Produces a triangular Bezier patch over a baricentric coordinate set.
+
+    For now we don't care about functional case.
+    """
+
+    n = order-1
+    
+    trib, Ub = u_bar(n) 
+
+    d, ntot = np.shape(control_net)
+
+    assert ntot == (n+1)*(n+2)/2, "Number of control points mismatch respect to `n`"
+
+    tri, U = u_bar(ntab)
+    _, N = np.shape(U)
+    surface = np.zeros((d, N, ntot))
+
+    for di in range(d): surface[di,:,:] = np.ones((N,1)) * control_net[di, :ntot]    
+
+    for r in range(n):
+
+        surface_c = np.copy(surface)
+
+        nr = n-r+1
+
+        for k in range(n-r):
+            nrk = nr-k
+            for i in range(n-r-k):
+                ind1 = sum(range(nrk+1, nr+1)) + i + 1
+                ind2 = 1 + ind1
+                ind3 = sum(range(nrk, nr+1))+ i + 1
+                ind  = sum(nrk, nr) + i + 1
+
+                for di in range(d):
+                    first_row   = np.multiply(U[1,:], surface_c[di, :, ind1])
+                    second_row  = np.multiply(U[2,:], surface_c[di, :, ind2])
+                    third_row   = np.multiply(U[3,:], surface_c[di, :, ind3])
+                    surface[di,:,ind] = first_row + second_row + third_row
+
+    return surface[:,:,0], tri, U
+
+
+
+
+
+
