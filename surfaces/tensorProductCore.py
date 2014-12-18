@@ -3,15 +3,21 @@ import numpy as np
 
 def de_casteljau(t, control_net, return_diagonals=False):
     """
-    Returns a point on the Bezier curve.
+    Returns a point on the Bezier curve respect a given parameter.
 
-    This function applies de Casteljau algorithm, the
+    This function applies de Casteljau algorithm, using a
     constructive approach (ie, the geometric one).
 
     Given a control net, it produces a tuple (p, ud, ld) such that:
         - p is the point on the Bezier curve that interpolate the control net;
         - ud is an array containing points on the upper diagonal for curve splitting;
         - ld is an array containing points on the lower diagonal for curve splitting.
+    Observe that to get the triple with diagonals, the argument `return_diagonals`
+    should be set to `True`, otherwise only a point is returned.
+
+    This function is persistent respect the given control net, ie it doesn't 
+    change the given net but, working on a copy of it (requires little extra time to 
+    make a copy of it, this is included in big-O complexity).
 
     The overall complexity is O(n^2), where n is the number of control points.
     """
@@ -27,8 +33,8 @@ def de_casteljau(t, control_net, return_diagonals=False):
     lower_diagonal[0,:] = Q[-1,:]
     
     for k in range(1,n):
-        for i in range(n-k):
-            Q[i,:] = (1-t)*Q[i,:] + t*Q[i+1,:]
+
+        for i in range(n-k): Q[i,:] = (1-t)*Q[i,:] + t*Q[i+1,:]
         
         upper_diagonal[k,:] = Q[0,:]
         lower_diagonal[k,:] = Q[-(k+1),:]
@@ -114,11 +120,17 @@ def de_casteljau_surface(params, control_net):
     return point
 
 def naive_de_casteljau(control_net, tabs=None, squares_per_dim=20):
+    """
+    Naive implementation of de Casteljau algorithm for tensor product patches.
+    """
 
     squares_per_dim *= 10
 
-    X = np.linspace(0,1,squares_per_dim)
-    Y = np.linspace(0,1,squares_per_dim)
+    if tabs is None: 
+        tabs = (np.linspace(0,1, squares_per_dim), 
+                np.linspace(0,1, squares_per_dim))
+
+    X, Y = tabs
 
     X, Y = np.meshgrid(X, Y)
 
@@ -129,7 +141,7 @@ def naive_de_casteljau(control_net, tabs=None, squares_per_dim=20):
 
 def vectorized_de_casteljau(control_net, tabs=None, squares_per_dim=20):
     """
-    Vectorized implementation of de Casteljau algorithm.
+    Vectorized implementation of de Casteljau algorithm for tensor product patches.
     """
 
     squares_per_dim *= 10
