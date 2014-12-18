@@ -1,7 +1,7 @@
 
 import numpy as np
 
-def de_casteljau(t, control_net):
+def de_casteljau(t, control_net, return_diagonals=False):
     """
     Returns a point on the Bezier curve.
 
@@ -32,8 +32,10 @@ def de_casteljau(t, control_net):
         
         upper_diagonal[k,:] = Q[0,:]
         lower_diagonal[k,:] = Q[-(k+1),:]
-    
-    return Q[0,:], upper_diagonal, lower_diagonal
+   
+    point = Q[0,:]
+     
+    return (point, upper_diagonal, lower_diagonal) if return_diagonals else point
 
 
 def de_casteljau_surface(params, control_net):
@@ -67,20 +69,49 @@ def de_casteljau_surface(params, control_net):
     u, v = params
 
     rows, cols, d = np.shape(control_net)
-    
-    def combine_col(r, c): return (1-v)*control_net[r, c, :] + v*control_net[r, c+1, :]
-    def combine_row(r, c): return (1-u)*control_net[r, c, :] + u*control_net[r+1, c, :]
 
-    # for now assume to work with a square control net
-    for k in range(rows-1):
-        for r in range(rows-k): 
-            for c in range(cols-k-1): control_net[r, c, :] = combine_col(r, c) 
+    square = min(rows, cols)
+    
+    def combine_col(r, c): 
+        return (1-v)*control_net[r, c, :] + v*control_net[r, c+1, :]
+
+    def combine_row(r, c): 
+        return (1-u)*control_net[r, c, :] + u*control_net[r+1, c, :]
+
+#   Combine the largest square in the control net from the top-left corner
+    for k in range(square-1):
+        for r in range(square-k): 
+            for c in range(square-k-1): control_net[r, c, :] = combine_col(r, c) 
 
         # after the previous loops we've eliminated the rightmost column
-        for c in range(cols-k-1):
-            for r in range(rows-k-1): control_net[r, c, :] = combine_row(r, c)
+        for c in range(square-k-1):
+            for r in range(square-k-1): control_net[r, c, :] = combine_row(r, c)
 
-    return control_net[0, 0, :]
+    point = control_net[0, 0, :]
+
+    if cols > square:
+#       Combine remaining cols if any, using de Casteljau algorithm for curve case
+
+        def de_casteljau_on_col(c): return de_casteljau(u,control_net[:, c, :]) 
+
+        intermediate_row = np.array([de_casteljau_on_col(c)
+                                        for c in range(square-1, cols)] )
+        
+        point = de_casteljau(v, np.vstack((point, intermediate_row)))
+
+    elif rows > square:
+#       Combine remaining rows if any, using de Casteljau algorithm for curve case
+
+        def de_casteljau_on_row(r): return de_casteljau(v,control_net[r, :, :])
+
+        intermediate_col = np.array([de_casteljau_on_row(r) 
+                                        for r in range(square-1, rows)] )
+
+        point = de_casteljau(u, np.vstack((point, intermediate_col)))
+
+    else: pass # square control net already handled
+
+    return point
 
 def naive_de_casteljau(control_net, tabs=None, squares_per_dim=20):
 
@@ -96,15 +127,16 @@ def naive_de_casteljau(control_net, tabs=None, squares_per_dim=20):
 
     return surface, X.shape
 
-def vectorized_de_casteljau(control_net, tabs=None, breaks=20):
+def vectorized_de_casteljau(control_net, tabs=None, squares_per_dim=20):
     """
     Vectorized implementation of de Casteljau algorithm.
     """
 
-    breaks *= 10
+    squares_per_dim *= 10
 
     if tabs is None: 
-        tabs = np.linspace(0,1, breaks), np.linspace(0,1, breaks)
+        tabs = (np.linspace(0,1, squares_per_dim), 
+                np.linspace(0,1, squares_per_dim))
 
     u_tab, v_tab = tabs
 
