@@ -48,7 +48,7 @@ def u_bar(ntab):
         ind = None
 
         for it in range(ntab-kt-1):
-            ind = sm+it+1 # this `+1` is suspect
+            ind = sm+it 
             count += 1
             tri[count,:] = np.array([ind, ind+1, ind+nk-1])
             count += 1
@@ -58,8 +58,7 @@ def u_bar(ntab):
         tri[count,:] = np.array([ind+1, ind+2, ind+nk])
 
     count += 1
-#   Maybe in the following indeces we should subtract 1 if they are used to index matrix U
-    tri[count,:] = np.array([multi_indeces-2, multi_indeces-1, multi_indeces])
+    tri[count,:] = np.array([multi_indeces-3, multi_indeces-2, multi_indeces-1])
 
     assert count == ntab**2 - 1
 

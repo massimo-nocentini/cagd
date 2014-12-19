@@ -22,7 +22,7 @@ def exercise_one():
     figsize(15,15) 
     fig = plt.figure() 
     ax = fig.add_subplot(1, 1, 1, projection='3d') 
-    ax.plot_trisurf(x, y, z, cmap=plt.cm.Spectral)#, edgecolor='none')
+    ax.plot_trisurf(x, y, z, triangles=tri, cmap=plt.cm.Spectral)#, edgecolor='none')
 
 #________________________________________________________________________
 exercise_one()
