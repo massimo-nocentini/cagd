@@ -75,7 +75,7 @@ def de_casteljau(order, control_net, ntab, V=None):
 
     n = order-1
     
-    trib, Ub = u_bar(n) 
+    _, Ub = u_bar(n) 
 
     d, ntot = np.shape(control_net)
 
