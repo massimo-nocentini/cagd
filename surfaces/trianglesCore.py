@@ -27,19 +27,18 @@ def u_bar(ntab):
     multi_indeces = (ntab+1)*(ntab+2)/2 
 
     # points_on_each_segment = ntab+1
-
     U = np.empty((3, multi_indeces))
-    tri = np.empty((ntab^2, 3))
+    tri = np.empty((ntab**2, 3))
 
     count = 0
     for kt in range(ntab + 1):
-        np = ntab - kt + 1
-        U[:, count:count+np] = np.array(
-            [list(range(np-1,1,-1)),
-             list(range(np)),
-             kt * np.ones(np)], dtype="f")
-        U[:, count:count+np] /= ntab
-        count += np
+        _np = ntab - kt + 1
+        U[:, count:count+_np] = np.array(
+            [list(range(_np))[::-1],
+             list(range(_np)),
+             (kt * np.ones(_np)).tolist()])
+        U[:, count:count+_np] /= ntab
+        count += _np
 
     count = -1
     for kt in range(ntab-1):
@@ -62,7 +61,7 @@ def u_bar(ntab):
 #   Maybe in the following indeces we should subtract 1 if they are used to index matrix U
     tri[count,:] = np.array([multi_indeces-2, multi_indeces-1, multi_indeces])
 
-    assert count == ntab^2 - 1
+    assert count == ntab**2 - 1
 
     return tri, U
 
@@ -97,15 +96,15 @@ def de_casteljau(order, control_net, ntab, V=None):
         for k in range(n-r):
             nrk = nr-k
             for i in range(n-r-k):
-                ind1 = sum(range(nrk+1, nr+1)) + i + 1
+                ind1 = sum(range(nrk+1, nr+1)) + i
                 ind2 = 1 + ind1
-                ind3 = sum(range(nrk, nr+1))+ i + 1
-                ind  = sum(nrk, nr) + i + 1
+                ind3 = sum(range(nrk, nr+1))+ i
+                ind  = sum(range(nrk, nr)) + i
 
                 for di in range(d):
-                    first_row   = np.multiply(U[1,:], surface_c[di, :, ind1])
-                    second_row  = np.multiply(U[2,:], surface_c[di, :, ind2])
-                    third_row   = np.multiply(U[3,:], surface_c[di, :, ind3])
+                    first_row   = np.multiply(U[0,:], surface_c[di, :, ind1])
+                    second_row  = np.multiply(U[1,:], surface_c[di, :, ind2])
+                    third_row   = np.multiply(U[2,:], surface_c[di, :, ind3])
                     surface[di,:,ind] = first_row + second_row + third_row
 
     return surface[:,:,0], tri, U
