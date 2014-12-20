@@ -50,12 +50,13 @@ def u_bar(ntab):
 
         nk = ntab+2-kt
         sm = sum(range(nk,ntab+2))
+        end = sm + (ntab-kt-1)
 
-        for ind in (sm + it for it in range(ntab-kt-1)):
+        for ind in range(sm, end):
             update_tri_matrix(ind, ind+1, ind+nk-1)
             update_tri_matrix(ind+1, ind+nk-1, ind+nk)
 
-        update_tri_matrix(ind+1, ind+2, ind+nk)
+        update_tri_matrix(end, end+1, end+nk-1)
 
     update_tri_matrix(multi_indeces-3, multi_indeces-2, multi_indeces-1)
 
