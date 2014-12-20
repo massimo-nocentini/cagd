@@ -80,36 +80,40 @@ def de_casteljau(order, control_net, ntab, V=None):
 
     assert ntot == (n+1)*(n+2)/2, "Number of control points mismatch respect to `n`"
 
+    def foreach_dimension(func):
+        for di in range(d): func(di)
+
     tri, U = u_bar(ntab)
     _, N = np.shape(U)
     surface = np.zeros((d, N, ntot))
 
-    for di in range(d): surface[di,:,:] = np.ones((N,1)) * control_net[di, :ntot]    
+    def initialize_surface_with_control_points(di): 
+        surface[di,:,:] = np.ones((N,1)) * control_net[di, :ntot]    
+
+    foreach_dimension(initialize_surface_with_control_points)
 
     for r in range(n):
 
         surface_c = np.copy(surface)
-
         nr = n-r+1
 
         for k in range(n-r):
+
             nrk = nr-k
+
             for i in range(n-r-k):
+
                 ind1 = sum(range(nrk+1, nr+1)) + i
                 ind2 = 1 + ind1
-                ind3 = sum(range(nrk, nr+1))+ i
+                ind3 = sum(range(nrk, nr+1)) + i
                 ind  = sum(range(nrk, nr)) + i
 
-                for di in range(d):
+                def update_surface(di):
                     first_row   = np.multiply(U[0,:], surface_c[di, :, ind1])
                     second_row  = np.multiply(U[1,:], surface_c[di, :, ind2])
                     third_row   = np.multiply(U[2,:], surface_c[di, :, ind3])
                     surface[di,:,ind] = first_row + second_row + third_row
 
+                foreach_dimension(update_surface)
+
     return surface[:,:,0], tri, U
-
-
-
-
-
-
