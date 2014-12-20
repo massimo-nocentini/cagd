@@ -40,27 +40,26 @@ def u_bar(ntab):
         U[:, count:count+_np] /= ntab
         count += _np
 
-    count = -1
+    def update_tri_matrix(a, b, c):
+        update_tri_matrix.count += 1
+        tri[update_tri_matrix.count,:] = np.array([a, b, c])
+
+    update_tri_matrix.count = -1
+
     for kt in range(ntab-1):
 
         nk = ntab+2-kt
         sm = sum(range(nk,ntab+2))
-        ind = None
 
-        for it in range(ntab-kt-1):
-            ind = sm+it 
-            count += 1
-            tri[count,:] = np.array([ind, ind+1, ind+nk-1])
-            count += 1
-            tri[count,:] = np.array([ind+1, ind+nk-1, ind+nk])
+        for ind in (sm + it for it in range(ntab-kt-1)):
+            update_tri_matrix(ind, ind+1, ind+nk-1)
+            update_tri_matrix(ind+1, ind+nk-1, ind+nk)
 
-        count += 1
-        tri[count,:] = np.array([ind+1, ind+2, ind+nk])
+        update_tri_matrix(ind+1, ind+2, ind+nk)
 
-    count += 1
-    tri[count,:] = np.array([multi_indeces-3, multi_indeces-2, multi_indeces-1])
+    update_tri_matrix(multi_indeces-3, multi_indeces-2, multi_indeces-1)
 
-    assert count == ntab**2 - 1
+    assert update_tri_matrix.count == (ntab**2 - 1)
 
     return tri, U
 
