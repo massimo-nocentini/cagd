@@ -1,7 +1,7 @@
 
 import numpy as np
 
-def u_bar(ntab):
+def u_bar(ntab, return_multi_indices_matrix=False):
     """
     Produces a set of points uniformly distributed within a given triangle.
 
@@ -11,12 +11,13 @@ def u_bar(ntab):
     Consumes
     ========
     ntab    number of subinterval in each segment of triangle domain 
-            (ie, the parametric domain)
+            (ie, the parametric domain). Observe that on each tringle line
+            will lie `ntab+1` points.
 
     Produces
     ========
     tri     triangulation matrix of dimension `(ntab^2)x3`, 
-            observe that `ntab^2` is the number of triangles within the domain
+            observe that `ntab^2` is the number of triangles within the domain.
 
     U       baricentric coordinates matrix of dimension `3x((ntab+1)*(ntab+2)/2)`
     """
@@ -26,7 +27,6 @@ def u_bar(ntab):
 #   is even then `ntab+2` is even too, hence both are divisible by 2.
     multi_indeces = (ntab+1)*(ntab+2)/2 
 
-    # points_on_each_segment = ntab+1
     U = np.empty((3, multi_indeces))
     tri = np.empty((ntab**2, 3))
 
@@ -37,8 +37,10 @@ def u_bar(ntab):
             [list(range(_np))[::-1],
              list(range(_np)),
              (kt * np.ones(_np)).tolist()])
-        U[:, count:count+_np] /= ntab
         count += _np
+
+    multi_indices_matrix = np.copy(U) # just have a copy of multi indices
+    U /= ntab # make the matrix represent baricentric coordinates
 
     def update_tri_matrix(a, b, c):
         update_tri_matrix.count += 1
@@ -62,10 +64,10 @@ def u_bar(ntab):
 
     assert update_tri_matrix.count == (ntab**2 - 1)
 
-    return tri, U
+    return (tri, U, multi_indices_matrix) if return_multi_indices_matrix else (tri, U)
 
 
-def de_casteljau(order, control_net, ntab, V=None):
+def de_casteljau(order, control_net, ntab, triangulation=None):
     """
     Produces a triangular Bezier patch over a baricentric coordinate set.
 
@@ -74,8 +76,6 @@ def de_casteljau(order, control_net, ntab, V=None):
 
     n = order-1
     
-    _, Ub = u_bar(n) 
-
     d, ntot = np.shape(control_net)
 
     assert ntot == (n+1)*(n+2)/2, "Number of control points mismatch respect to `n`"
@@ -83,7 +83,9 @@ def de_casteljau(order, control_net, ntab, V=None):
     def foreach_dimension(func):
         for di in range(d): func(di)
 
-    tri, U = u_bar(ntab)
+    if triangulation is None: triangulation = u_bar(ntab)
+
+    tri, U, *rest = triangulation
     _, N = np.shape(U)
     surface = np.zeros((d, N, ntot))
 
