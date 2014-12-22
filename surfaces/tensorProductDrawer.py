@@ -4,7 +4,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 
-def draw(surface, shape, figure_size_tuple=(10,10), show_figure=True):
+def draw(surface, shape, figure_size_tuple=(15,15), show_figure=True):
 
     sizex, sizey = figure_size_tuple
 
