@@ -172,16 +172,19 @@ def de_casteljau(order, control_net, ntab=None, triangulation=None, subdivision=
     foreach_dimension(initialize_surface_with_control_points)
    
     if subdivision: 
+        assert ntot == N
+
         left_subpatch = np.empty(np.shape(control_net))
         right_subpatch = np.empty(np.shape(control_net))
         bottom_subpatch = np.empty(np.shape(control_net))
         
-        left_inv_diagonal = np.cumsum(range(order))
+        #left_inv_diagonal = np.cumsum(range(order))
+        left_inv_diagonal = np.array(range(order))
         offsets = np.array(range(order))
         right_diagonal = left_inv_diagonal+offsets
         bottom_line = left_inv_diagonal[-1] + np.array(range(order))
 
-        for l in left_inv_diagonal: left_subpatch[:, l] = surface[:, l, l]
+        for l in offsets: left_subpatch[:, l] = surface[:, l, l]
         for r in right_diagonal:    right_subpatch[:, r] = surface[:, r, r]
         for b in bottom_line:       bottom_subpatch[:, b] = surface[:, b, b]
 
@@ -208,11 +211,13 @@ def de_casteljau(order, control_net, ntab=None, triangulation=None, subdivision=
                     surface[di,:,ind] = first_row + second_row + third_row
 
                 foreach_dimension(update_surface)
+                print("ind and surface:", ind, "\n", surface[:,:,ind])
 
         if subdivision:       
 
-            for ls, s in zip(left_inv_diagonal[r+1:] + offsets[r+1], 
-                             left_inv_diagonal[:n-r]): 
+            left_inv_diagonal = left_inv_diagonal[1:]
+            left_inv_diagonal += offsets[-(r+1)]
+            for ls, s in zip(left_inv_diagonal, offsets[:n-r]): 
                 left_subpatch[:, ls] = surface[:, s, s]
 
             for rs, s in zip(right_diagonal[r+1:] - offsets[r+1], 
@@ -223,6 +228,14 @@ def de_casteljau(order, control_net, ntab=None, triangulation=None, subdivision=
             bottom_line = bottom_line[1:] 
             bottom_line -= offsets[-(r+1)]+1
             for bs in bottom_line: bottom_subpatch[:, b] = surface[:, b, b]
+
+
+    if subdivision:
+        first_row   = surface[:, :, 0].dot(np.reshape(U[0,:], (N,1)))
+        second_row  = surface[:, :, 1].dot(np.reshape(U[1,:], (N,1)))
+        third_row   = surface[:, :, 2].dot(np.reshape(U[2,:], (N,1)))
+        point_on_surface = first_row + second_row + third_row
+        print("point on surface:\n", point_on_surface)
 
     surface = surface[:,:,0]
 
