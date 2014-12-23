@@ -116,7 +116,7 @@ def u_bar(ntab, return_multi_indices_matrix=False):
     return (tri, U, multi_indices_matrix) if return_multi_indices_matrix else (tri, U)
 
 
-def de_casteljau(order, control_net, ntab, triangulation=None):
+def de_casteljau(order, control_net, ntab=None, triangulation=None, subdivision=False):
     """
     Produces a triangular Bezier patch over a baricentric coordinate set.
 
@@ -155,8 +155,11 @@ def de_casteljau(order, control_net, ntab, triangulation=None):
     def foreach_dimension(func):
         for di in range(d): func(di)
 
-    if triangulation is None: 
-        tri, U, multi_indices = u_bar(ntab, return_multi_indices_matrix=True)
+#   ignore the given ntab if subdivision requested or ntab not consumed
+    if subdivision or ntab is None: ntab = n 
+
+    if triangulation is None or subdivision: 
+        tri, U, multi_indices_matrix = u_bar(ntab, return_multi_indices_matrix=True)
     else:
         tri, U, *rest = triangulation # we unpack with a collecting `rest`
 
@@ -167,6 +170,20 @@ def de_casteljau(order, control_net, ntab, triangulation=None):
         surface[di,:,:] = np.ones((N,1)) * control_net[di, :ntot]    
 
     foreach_dimension(initialize_surface_with_control_points)
+   
+    if subdivision: 
+        left_subpatch = np.empty(np.shape(control_net))
+        right_subpatch = np.empty(np.shape(control_net))
+        bottom_subpatch = np.empty(np.shape(control_net))
+        
+        left_inv_diagonal = np.cumsum(range(order))
+        offsets = np.array(range(order))
+        right_diagonal = left_inv_diagonal+offsets
+        bottom_line = left_inv_diagonal[-1] + np.array(range(order))
+
+        for l in left_inv_diagonal: left_subpatch[:, l] = surface[:, l, l]
+        for r in right_diagonal:    right_subpatch[:, r] = surface[:, r, r]
+        for b in bottom_line:       bottom_subpatch[:, b] = surface[:, b, b]
 
     for r in range(n):
 
@@ -192,6 +209,28 @@ def de_casteljau(order, control_net, ntab, triangulation=None):
 
                 foreach_dimension(update_surface)
 
+        if subdivision:       
+
+            for ls, s in zip(left_inv_diagonal[r+1:] + offsets[r+1], 
+                             left_inv_diagonal[:n-r]): 
+                left_subpatch[:, ls] = surface[:, s, s]
+
+            for rs, s in zip(right_diagonal[r+1:] - offsets[r+1], 
+                             right_diagonal[:n-r]): 
+                right_subpatch[:, ls] = surface[:, s, s]
+
+#           Remember: """AttributeError: 'numpy.ndarray' object has no attribute 'pop'"""
+            bottom_line = bottom_line[1:] 
+            bottom_line -= offsets[-(r+1)]+1
+            for bs in bottom_line: bottom_subpatch[:, b] = surface[:, b, b]
+
     surface = surface[:,:,0]
 
-    return (surface, tri, U, multi_indices_matrix) if triangulation is None else surface
+#   Making results tuple, not matter the optional requests about triangulation
+#   and subdivision, we return a nested tuple in both cases.
+    results = (surface,)
+    if triangulation is None: results += ((tri, U, multi_indices_matrix),)
+    if subdivision: results += ((left_subpatch, right_subpatch, bottom_subpatch),)
+
+    return results
+
