@@ -184,7 +184,7 @@ def de_casteljau(order, control_net, ntab=None, triangulation=None, subdivision=
         right_diagonal = left_inv_diagonal+offsets
         bottom_line = left_inv_diagonal[-1] + np.array(range(order))
 
-        for l in offsets: left_subpatch[:, l] = surface[:, l, l]
+        for l in offsets:           left_subpatch[:, l] = surface[:, l, l]
         for r in right_diagonal:    right_subpatch[:, r] = surface[:, r, r]
         for b in bottom_line:       bottom_subpatch[:, b] = surface[:, b, b]
 
@@ -204,6 +204,16 @@ def de_casteljau(order, control_net, ntab=None, triangulation=None, subdivision=
                 ind3 = sum(range(nrk, nr+1)) + i
                 ind  = sum(range(nrk, nr)) + i
 
+                if r == n-1: # ie. the very last iteration to compute the point on surface
+                    top_point = (surface[:, 0, ind1] + surface[:, ntab, ind1] + surface[:, -1, ind1])/float(3)
+                    left_point = (surface[:, 0, ind2] + surface[:, ntab, ind2] + surface[:, -1, ind2])/float(3)
+                    right_point = (surface[:, 0, ind3] + surface[:, ntab, ind3] + surface[:, -1, ind3])/float(3)
+                    print("Top vertex: ", top_point)
+                    print("Left vertex: ", left_point)
+                    print("Right vertex: ", right_point)
+                    point_on_surface = (top_point + left_point + right_point)/float(3)
+                    print("Point on surface: ", point_on_surface)
+
                 def update_surface(di):
                     first_row   = np.multiply(U[0,:], surface_c[di, :, ind1])
                     second_row  = np.multiply(U[1,:], surface_c[di, :, ind2])
@@ -211,17 +221,19 @@ def de_casteljau(order, control_net, ntab=None, triangulation=None, subdivision=
                     surface[di,:,ind] = first_row + second_row + third_row
 
                 foreach_dimension(update_surface)
+                print("first point on surface for ind:", ind, surface[:,0,ind])
                 print("ind and surface:", ind, "\n", surface[:,:,ind])
+                print("ind and surface_c:", ind, "\n", surface_c[:,:,ind])
 
         if subdivision:       
 
             left_inv_diagonal = left_inv_diagonal[1:]
             left_inv_diagonal += offsets[-(r+1)]
             for ls, s in zip(left_inv_diagonal, offsets[:n-r]): 
-                left_subpatch[:, ls] = surface[:, s, s]
+                comb = surface[:, 0, s] + surface[:, ntab, s] + surface[:, -1, s]
+                left_subpatch[:, ls] = comb/float(3)
 
-            for rs, s in zip(right_diagonal[r+1:] - offsets[r+1], 
-                             right_diagonal[:n-r]): 
+            for rs, s in zip(right_diagonal[r+1:]-offsets[r+1], right_diagonal[:n-r]): 
                 right_subpatch[:, ls] = surface[:, s, s]
 
 #           Remember: """AttributeError: 'numpy.ndarray' object has no attribute 'pop'"""
@@ -229,13 +241,8 @@ def de_casteljau(order, control_net, ntab=None, triangulation=None, subdivision=
             bottom_line -= offsets[-(r+1)]+1
             for bs in bottom_line: bottom_subpatch[:, b] = surface[:, b, b]
 
-
     if subdivision:
-        first_row   = surface[:, :, 0].dot(np.reshape(U[0,:], (N,1)))
-        second_row  = surface[:, :, 1].dot(np.reshape(U[1,:], (N,1)))
-        third_row   = surface[:, :, 2].dot(np.reshape(U[2,:], (N,1)))
-        point_on_surface = first_row + second_row + third_row
-        print("point on surface:\n", point_on_surface)
+        left_subpatch[:,-1] = point_on_surface
 
     surface = surface[:,:,0]
 
