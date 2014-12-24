@@ -178,20 +178,24 @@ def de_casteljau(order, control_net, ntab=None, triangulation=None, subdivision=
         right_subpatch = np.empty(np.shape(control_net))
         bottom_subpatch = np.empty(np.shape(control_net))
         
-        #left_inv_diagonal = np.cumsum(range(order))
         left_inv_diagonal = np.array(range(order))
-        offsets = np.array(range(order))
-        right_diagonal = left_inv_diagonal+offsets
-        bottom_line = left_inv_diagonal[-1] + np.array(range(order))
+        offsets = np.array(range(order)) 
+        right_diagonal = np.cumsum([0] + list(range(order,1,-1)))
+        bottom_diagonal = np.cumsum([n] + list(range(n,0,-1)))
 
-        for l in offsets:           left_subpatch[:, l] = surface[:, l, l]
-        for r in right_diagonal:    right_subpatch[:, r] = surface[:, r, r]
-        for b in bottom_line:       bottom_subpatch[:, b] = surface[:, b, b]
+        left_subpatch[:, left_inv_diagonal] = control_net[:, left_inv_diagonal]
+        right_subpatch[:, right_diagonal] = control_net[:, right_diagonal]
+        bottom_subpatch[:, bottom_diagonal] = control_net[:, bottom_diagonal]
+
+    layers = []
 
     for r in range(n):
 
         surface_c = np.copy(surface)
         nr = n-r+1
+
+        layer = []
+        layers.append(layer)
 
         for k in range(n-r):
 
@@ -204,15 +208,16 @@ def de_casteljau(order, control_net, ntab=None, triangulation=None, subdivision=
                 ind3 = sum(range(nrk, nr+1)) + i
                 ind  = sum(range(nrk, nr)) + i
 
-                if r == n-1: # ie. the very last iteration to compute the point on surface
-                    top_point = (surface[:, 0, ind1] + surface[:, ntab, ind1] + surface[:, -1, ind1])/float(3)
-                    left_point = (surface[:, 0, ind2] + surface[:, ntab, ind2] + surface[:, -1, ind2])/float(3)
-                    right_point = (surface[:, 0, ind3] + surface[:, ntab, ind3] + surface[:, -1, ind3])/float(3)
-                    print("Top vertex: ", top_point)
-                    print("Left vertex: ", left_point)
-                    print("Right vertex: ", right_point)
-                    point_on_surface = (top_point + left_point + right_point)/float(3)
-                    print("Point on surface: ", point_on_surface)
+                top_point = (surface[:, 0, ind1] + surface[:, ntab, ind1] + surface[:, -1, ind1])/float(3)
+                left_point = (surface[:, 0, ind2] + surface[:, ntab, ind2] + surface[:, -1, ind2])/float(3)
+                right_point = (surface[:, 0, ind3] + surface[:, ntab, ind3] + surface[:, -1, ind3])/float(3)
+                print("Top vertex: ", top_point)
+                print("Left vertex: ", left_point)
+                print("Right vertex: ", right_point)
+                combined_point = (top_point + left_point + right_point)/float(3)
+                print("Point on surface: ", combined_point)
+
+                layer.append(combined_point)
 
                 def update_surface(di):
                     first_row   = np.multiply(U[0,:], surface_c[di, :, ind1])
@@ -225,24 +230,32 @@ def de_casteljau(order, control_net, ntab=None, triangulation=None, subdivision=
                 print("ind and surface:", ind, "\n", surface[:,:,ind])
                 print("ind and surface_c:", ind, "\n", surface_c[:,:,ind])
 
-        if subdivision:       
+    if subdivision:       
+        
+        for r in range(n):
+
+            layer = layers[r]
 
             left_inv_diagonal = left_inv_diagonal[1:]
             left_inv_diagonal += offsets[-(r+1)]
             for ls, s in zip(left_inv_diagonal, offsets[:n-r]): 
-                comb = surface[:, 0, s] + surface[:, ntab, s] + surface[:, -1, s]
-                left_subpatch[:, ls] = comb/float(3)
+                left_subpatch[:, ls] = layer[s]
 
-            for rs, s in zip(right_diagonal[r+1:]-offsets[r+1], right_diagonal[:n-r]): 
-                right_subpatch[:, ls] = surface[:, s, s]
+            right_diagonal = right_diagonal[1:]
+            right_diagonal -= offsets[-1:-order+r:-1]
+            for rs, s in zip(right_diagonal, np.cumsum([0] + list(range(n-r,1,-1)))): 
+                right_subpatch[:, rs] = layer[s]
 
 #           Remember: """AttributeError: 'numpy.ndarray' object has no attribute 'pop'"""
-            bottom_line = bottom_line[1:] 
-            bottom_line -= offsets[-(r+1)]+1
-            for bs in bottom_line: bottom_subpatch[:, b] = surface[:, b, b]
+            bottom_diagonal = bottom_diagonal[1:] 
+            bottom_diagonal -= offsets[-1:-order+r:-1] + 1
+            for bs, s in zip(bottom_diagonal, np.cumsum([n-1-r] + list(range(n-1-r,0,-1)))): 
+                bottom_subpatch[:, bs] = layer[s]
 
-    if subdivision:
-        left_subpatch[:,-1] = point_on_surface
+    print("Layers structure:\n", layers)
+
+    #if subdivision:
+        #left_subpatch[:,-1] = combined_point
 
     surface = surface[:,:,0]
 
