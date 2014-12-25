@@ -155,13 +155,19 @@ def de_casteljau(order, control_net, ntab=None, triangulation=None, subdivision=
     def foreach_dimension(func):
         for di in range(d): func(di)
 
-#   ignore the given ntab if subdivision requested or ntab not consumed
-    if subdivision or ntab is None: ntab = n 
+    if ntab is None: ntab = 2*n # double the number of control points for "tabulation"
 
-    if triangulation is None or subdivision: 
+    if triangulation is None: 
         tri, U, multi_indices_matrix = u_bar(ntab, return_multi_indices_matrix=True)
     else:
-        tri, U, *rest = triangulation # we unpack with a collecting `rest`
+#       we unpack with a collecting `rest`...
+        tri, U, *rest = triangulation 
+        
+#       ...and do some dimensional checks
+        _n, N = np.shape(U)
+        T, t = np.shape(tri)
+        assert N == (ntab+1)*(ntab+2)/2 and _n is 3
+        assert T == ntab**2 and t is 3
 
     _, N = np.shape(U)
     surface = np.zeros((d, N, ntot))
@@ -172,17 +178,22 @@ def de_casteljau(order, control_net, ntab=None, triangulation=None, subdivision=
     foreach_dimension(initialize_surface_with_control_points)
    
     if subdivision: 
-        assert ntot == N
 
+#       Prepare subpatches: everyone has the same shape of the original control net
         left_subpatch = np.empty(np.shape(control_net))
         right_subpatch = np.empty(np.shape(control_net))
         bottom_subpatch = np.empty(np.shape(control_net))
         
-        left_inv_diagonal = np.array(range(order))
+#       Indices vectors (aka. `diagonals`) for sub-patches construction
+#       Pay attention: it is important to not use `ntab` here, since
+#       `ntab` deals with tabulation only, ie only with the set of triangles
+#       we'll use to represent patches, which can extend arbitrarily.
         offsets = np.array(range(order)) 
+        left_inv_diagonal = np.array(range(order))
         right_diagonal = np.cumsum([0] + list(range(order,1,-1)))
         bottom_diagonal = np.cumsum([n] + list(range(n,0,-1)))
 
+#       Vector-wise initialization with control points on main diagonals
         left_subpatch[:, left_inv_diagonal] = control_net[:, left_inv_diagonal]
         right_subpatch[:, right_diagonal] = control_net[:, right_diagonal]
         bottom_subpatch[:, bottom_diagonal] = control_net[:, bottom_diagonal]
@@ -203,19 +214,34 @@ def de_casteljau(order, control_net, ntab=None, triangulation=None, subdivision=
 
             for i in range(n-r-k):
 
+#               Indices of each triangle extrema to combine in this step
                 ind1 = sum(range(nrk+1, nr+1)) + i
                 ind2 = 1 + ind1
                 ind3 = sum(range(nrk, nr+1)) + i
+
+#               Index of `new` position for combined point
                 ind  = sum(range(nrk, nr)) + i
 
-                top_point = (surface[:, 0, ind1] + surface[:, ntab, ind1] + surface[:, -1, ind1])/float(3)
-                left_point = (surface[:, 0, ind2] + surface[:, ntab, ind2] + surface[:, -1, ind2])/float(3)
-                right_point = (surface[:, 0, ind3] + surface[:, ntab, ind3] + surface[:, -1, ind3])/float(3)
-                print("Top vertex: ", top_point)
-                print("Left vertex: ", left_point)
-                print("Right vertex: ", right_point)
+#               Combined points using indices and barycentric coordinates
+#               in each triangle needed for the combination.
+#               Observe that for indexing in the barycentri coordinates dimension
+#               we refer to `ntab`, hence we're independent from the choice
+#               of barycentric coordinates (aka. "tabulation")
+                top_point = (surface[:, 0, ind1] 
+                            + surface[:, ntab, ind1] 
+                            + surface[:, -1, ind1])/float(3)
+
+                left_point = (  surface[:, 0, ind2] 
+                                + surface[:, ntab, ind2] 
+                                + surface[:, -1, ind2])/float(3)
+
+                right_point = ( surface[:, 0, ind3] 
+                                + surface[:, ntab, ind3] 
+                                + surface[:, -1, ind3])/float(3)
+
+#               de Casteljau interpolation point for the current iteration
+#               Observe that `if r == n-1` then this point __really lies on patch__.
                 combined_point = (top_point + left_point + right_point)/float(3)
-                print("Point on surface: ", combined_point)
 
                 layer.append(combined_point)
 
@@ -226,15 +252,12 @@ def de_casteljau(order, control_net, ntab=None, triangulation=None, subdivision=
                     surface[di,:,ind] = first_row + second_row + third_row
 
                 foreach_dimension(update_surface)
-                print("first point on surface for ind:", ind, surface[:,0,ind])
-                print("ind and surface:", ind, "\n", surface[:,:,ind])
-                print("ind and surface_c:", ind, "\n", surface_c[:,:,ind])
 
+#   At the end of layers construction and if subdivision is required we build
+#   control nets relative to left, right and bottom sub-patches respectively.
     if subdivision:       
         
-        for r in range(n):
-
-            layer = layers[r]
+        for r, layer in zip(range(n), layers):
 
             left_inv_diagonal = left_inv_diagonal[1:]
             left_inv_diagonal += offsets[-(r+1)]
@@ -251,11 +274,6 @@ def de_casteljau(order, control_net, ntab=None, triangulation=None, subdivision=
             bottom_diagonal -= offsets[-1:-order+r:-1] + 1
             for bs, s in zip(bottom_diagonal, np.cumsum([n-1-r] + list(range(n-1-r,0,-1)))): 
                 bottom_subpatch[:, bs] = layer[s]
-
-    print("Layers structure:\n", layers)
-
-    #if subdivision:
-        #left_subpatch[:,-1] = combined_point
 
     surface = surface[:,:,0]
 
