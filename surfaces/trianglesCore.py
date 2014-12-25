@@ -257,31 +257,31 @@ def de_casteljau(order, control_net, ntab=None, triangulation=None, subdivision=
 #   control nets relative to left, right and bottom sub-patches respectively.
     if subdivision:       
         
-        for r, layer in zip(range(n), layers):
+        for r, layer in zip(range(n), map(np.array, layers)):
+
+#           Remember: """AttributeError: 'numpy.ndarray' object has no attribute 'pop'"""
 
             left_inv_diagonal = left_inv_diagonal[1:]
             left_inv_diagonal += offsets[-(r+1)]
-            for ls, s in zip(left_inv_diagonal, offsets[:n-r]): 
-                left_subpatch[:, ls] = layer[s]
+            left_subpatch[:, left_inv_diagonal] = layer[
+                offsets[:n-r]].transpose()
 
             right_diagonal = right_diagonal[1:]
             right_diagonal -= offsets[-1:-order+r:-1]
-            for rs, s in zip(right_diagonal, np.cumsum([0] + list(range(n-r,1,-1)))): 
-                right_subpatch[:, rs] = layer[s]
+            right_subpatch[:, right_diagonal] = layer[
+                np.cumsum([0] + list(range(n-r,1,-1)))].transpose()
 
-#           Remember: """AttributeError: 'numpy.ndarray' object has no attribute 'pop'"""
             bottom_diagonal = bottom_diagonal[1:] 
             bottom_diagonal -= offsets[-1:-order+r:-1] + 1
-            for bs, s in zip(bottom_diagonal, np.cumsum([n-1-r] + list(range(n-1-r,0,-1)))): 
-                bottom_subpatch[:, bs] = layer[s]
+            bottom_subpatch[:, bottom_diagonal] = layer[
+                np.cumsum([n-1-r] + list(range(n-1-r,0,-1)))].transpose()
 
     surface = surface[:,:,0]
 
 #   Making results tuple, not matter the optional requests about triangulation
 #   and subdivision, we return a nested tuple in both cases.
-    results = (surface,)
+    results = ((surface, layers),)
     if triangulation is None: results += ((tri, U, multi_indices_matrix),)
     if subdivision: results += ((left_subpatch, right_subpatch, bottom_subpatch),)
 
     return results
-
