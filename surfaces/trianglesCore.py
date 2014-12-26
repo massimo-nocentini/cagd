@@ -1,7 +1,7 @@
 
 import numpy as np
 
-def u_bar(ntab, return_multi_indices_matrix=False):
+def u_bar(ntab, return_multi_indices_matrix=False, triangles_partitions=False):
     """
     Produces a set of points uniformly distributed within a given triangle.
 
@@ -91,6 +91,15 @@ def u_bar(ntab, return_multi_indices_matrix=False):
     multi_indices_matrix = np.copy(U) # just have a copy of multi indices
     U /= ntab # make the matrix represent baricentric coordinates
 
+    # the following lists allow to build partitions of triangles
+    partitioned_triangles = {
+        'upside':[],
+        'upside_down':[],
+        'on_left_inv_diagonal':[],
+        'on_right_diagonal':[],
+        'on_bottom_diagonal':[]
+        }
+
     def update_tri_matrix(a, b, c):
         update_tri_matrix.count += 1
         tri[update_tri_matrix.count,:] = np.array([a, b, c])
@@ -103,18 +112,47 @@ def u_bar(ntab, return_multi_indices_matrix=False):
         sm = sum(range(nk,ntab+2))
         end = sm + (ntab-kt-1)
 
-        for ind in range(sm, end):
-            update_tri_matrix(ind, ind+1, ind+nk-1)
-            update_tri_matrix(ind+1, ind+nk-1, ind+nk)
+        for i, ind in enumerate(range(sm, end)):
 
-        update_tri_matrix(end, end+1, end+nk-1)
+            upside_triangle = (ind, ind+1, ind+nk-1)
+            upside_down_triangle = (ind+1, ind+nk-1, ind+nk)
 
-    update_tri_matrix(multi_indeces-3, multi_indeces-2, multi_indeces-1)
+            update_tri_matrix(*upside_triangle)
+            update_tri_matrix(*upside_down_triangle)
+            
+            partitioned_triangles['upside'].append(upside_triangle) 
+            partitioned_triangles['upside_down'].append(upside_down_triangle) 
+
+#           using `i` from the enumeration allow us to look for the very first
+#           triangle without comparing against `sm`, the start value of `range`
+            if i is 0: partitioned_triangles['on_right_diagonal'].append(upside_triangle) 
+
+        last_triangle = (end, end+1, end+nk-1)
+        update_tri_matrix(*last_triangle)
+        partitioned_triangles['upside'].append(last_triangle) 
+        partitioned_triangles['on_bottom_diagonal'].append(last_triangle) 
+
+    rightmost_bottom_triangle = (multi_indeces-3, multi_indeces-2, multi_indeces-1)
+    update_tri_matrix(*rightmost_bottom_triangle)
+    partitioned_triangles['on_right_diagonal'].append(rightmost_bottom_triangle) 
+    partitioned_triangles['on_bottom_diagonal'].append(rightmost_bottom_triangle) 
+
+    partitioned_triangles['on_left_inv_diagonal'] = partitioned_triangles['upside'][:ntab]
 
     assert update_tri_matrix.count == (ntab**2 - 1)
 
-    return (tri, U, multi_indices_matrix) if return_multi_indices_matrix else (tri, U)
+    assert (len(partitioned_triangles['on_left_inv_diagonal']) ==
+            len(partitioned_triangles['on_right_diagonal']) ==
+            len(partitioned_triangles['on_bottom_diagonal']) == 
+            ntab)
 
+    result = (tri, U)
+    if return_multi_indices_matrix: result += (multi_indices_matrix,)
+    if triangles_partitions: result += (partitioned_triangles,)
+    
+    return result
+
+#_______________________________________________________________________
 
 def de_casteljau(order, control_net, ntab=None, triangulation=None, subdivision=False):
     """
