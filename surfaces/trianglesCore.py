@@ -69,12 +69,30 @@ def u_bar(ntab, return_multi_indices_matrix=False, triangles_partitions=False):
            [ 10.,  12.,  13.],
            [ 10.,  11.,  13.],
            [ 12.,  13.,  14.]])
+
+    In the following we show how to partition triangles:
+    >>> tri, U, partitioned_triangles = u_bar(ntab=5, triangles_partitions=True)
+    >>> partitioned_triangles['upside']
+    [(0, 1, 6), (1, 2, 7), (2, 3, 8), (3, 4, 9), (4, 5, 10), (6, 7, 11), (7, 8, 12), (8, 9, 13), (9, 10, 14), (11, 12, 15), (12, 13, 16), (13, 14, 17), (15, 16, 18), (16, 17, 19), (18, 19, 20)]
+
+    >>> partitioned_triangles['upside_down']
+    [(1, 6, 7), (2, 7, 8), (3, 8, 9), (4, 9, 10), (7, 11, 12), (8, 12, 13), (9, 13, 14), (12, 15, 16), (13, 16, 17), (16, 18, 19)]
+
+    >>> partitioned_triangles['on_left_inv_diagonal']
+    [(0, 1, 6), (1, 2, 7), (2, 3, 8), (3, 4, 9), (4, 5, 10)]
+
+    >>> partitioned_triangles['on_right_diagonal']
+    [(0, 1, 6), (6, 7, 11), (11, 12, 15), (15, 16, 18), (18, 19, 20)]
+
+    >>> partitioned_triangles['on_bottom_diagonal']
+    [(4, 5, 10), (9, 10, 14), (13, 14, 17), (16, 17, 19), (18, 19, 20)]
+
     """
 
 #   observe that it is always possible to halve the next quantity, 
 #   since if `ntab` is odd then `ntab+1` is even, and if `ntab` 
 #   is even then `ntab+2` is even too, hence both are divisible by 2.
-    multi_indeces = (ntab+1)*(ntab+2)/2 
+    multi_indeces = int((ntab+1)*(ntab+2)/2) 
 
     U = np.empty((3, multi_indeces))
     tri = np.empty((ntab**2, 3))
@@ -91,7 +109,7 @@ def u_bar(ntab, return_multi_indices_matrix=False, triangles_partitions=False):
     multi_indices_matrix = np.copy(U) # just have a copy of multi indices
     U /= ntab # make the matrix represent baricentric coordinates
 
-    # the following lists allow to build partitions of triangles
+    # the following lists allow to partition triangles
     partitioned_triangles = {
         'upside':[],
         'upside_down':[],
@@ -134,6 +152,7 @@ def u_bar(ntab, return_multi_indices_matrix=False, triangles_partitions=False):
 
     rightmost_bottom_triangle = (multi_indeces-3, multi_indeces-2, multi_indeces-1)
     update_tri_matrix(*rightmost_bottom_triangle)
+    partitioned_triangles['upside'].append(rightmost_bottom_triangle) 
     partitioned_triangles['on_right_diagonal'].append(rightmost_bottom_triangle) 
     partitioned_triangles['on_bottom_diagonal'].append(rightmost_bottom_triangle) 
 
