@@ -362,7 +362,7 @@ def degree_elevation(order, control_net):
 
     sandbox = np.zeros((d, N, ntot))
 
-    augmented_control_net = np.empty((d, new_order))
+    augmented_control_net = np.empty((d, int((old_order+1)*(old_order+2)/2)))
 
     def foreach_dimension(func):
         for di in range(d): func(di)
@@ -386,8 +386,30 @@ using upside down triangle {} (rotated clockwise {})
         """
         print(log.format(*args))
 
+    def barycentric_combine(triangle):
+        
+        ind1, ind2, ind3 = triangle
+        barycentric_comb = np.empty((d, N))
+
+        def update_surface(di):
+            first_row   = np.multiply(U[0,:], sandbox[di, :, ind1])
+            second_row  = np.multiply(U[1,:], sandbox[di, :, ind2])
+            third_row   = np.multiply(U[2,:], sandbox[di, :, ind3])
+            barycentric_comb[di,:] = first_row + second_row + third_row
+
+        foreach_dimension(update_surface)
+
+#       Why not the following?
+        #first_row   = np.multiply(U, sandbox[:, :, ind1])
+        #second_row  = np.multiply(U, sandbox[:, :, ind2])
+        #third_row   = np.multiply(U, sandbox[:, :, ind3])
+        #barycentric_comb = first_row + second_row + third_row
+
+        return barycentric_comb
+
     def upside_down_triangles_handler(triangles):
         t = 0
+        barycentric_combination = None
         for top_most_vertex_in_right_diagonal_triangles, forward_offset in zip(
                 np.cumsum([old_order + 2] + list(range(old_order,old_order-2 -1,-1))),
                 range(old_order-2, 0, -1)): 
@@ -400,6 +422,9 @@ using upside down triangle {} (rotated clockwise {})
                          np.cumsum([old_order+1+forward_offset] + list(range(old_order-1,old_order-forward_offset,-1)))): 
 
                 log(k, comb, triangles[t], rotate_clockwise(triangles[t]))
+                
+                barycentric_combination = barycentric_combine(rotate_clockwise(triangles[t]))
+                augmented_control_net[:, k] = barycentric_combination[:, comb]
 
                 covered_points.append(k)
                 t += 1
