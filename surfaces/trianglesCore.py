@@ -354,7 +354,9 @@ def degree_elevation(order, control_net):
     old_order = order
     new_order = old_order + 1
 
-    tri, U, partitioned_triangles = u_bar(ntab=old_order, triangles_partitions=True)
+    _, U = u_bar(ntab=old_order)
+
+    tri, _, partitioned_triangles = u_bar(ntab=old_order-1, triangles_partitions=True)
 
     _, N = np.shape(U)
 
@@ -370,25 +372,74 @@ def degree_elevation(order, control_net):
 
     foreach_dimension(initialize_sandbox_with_control_points)
   
-    for top_most_vertex_in_right_diagonal_triangles, forward_offset in zip(
-            np.cumsum([old_order + 2] + list(range(old_order,old_order-2 -1,-1))),
-            range(old_order-2, 0, -1)): 
+    covered_points = []
 
-        print("(top_most_vertex_in_right_diagonal_triangles, forward_offset): ", 
-            top_most_vertex_in_right_diagonal_triangles, forward_offset)
+    def rotate_clockwise(triangle): 
+        a, b, c = triangle
+        return a, c, b
 
-        for k, comb in zip([top_most_vertex_in_right_diagonal_triangles + i 
-                        for i in range(forward_offset)],
-                     np.cumsum([old_order+1+forward_offset] + list(range(old_order-1,old_order-forward_offset,-1)))): 
+    def log(*args):
+        log = """
+control point position {} is under assignment 
+from combination coordinate {} 
+using upside down triangle {} (rotated clockwise {})
+        """
+        print(log.format(*args))
 
-            print("should assign combination to augmented control net index: ", k, comb)
-            
- 
+    def upside_down_triangles_handler(triangles):
+        t = 0
+        for top_most_vertex_in_right_diagonal_triangles, forward_offset in zip(
+                np.cumsum([old_order + 2] + list(range(old_order,old_order-2 -1,-1))),
+                range(old_order-2, 0, -1)): 
 
+            print("start of diagonal iteration on upside down triangles for control point position {}, with forward offset {}:".
+                    format(top_most_vertex_in_right_diagonal_triangles, forward_offset))
 
+            for k, comb in zip([top_most_vertex_in_right_diagonal_triangles + i 
+                            for i in range(forward_offset)],
+                         np.cumsum([old_order+1+forward_offset] + list(range(old_order-1,old_order-forward_offset,-1)))): 
 
+                log(k, comb, triangles[t], rotate_clockwise(triangles[t]))
 
+                covered_points.append(k)
+                t += 1
+          
+    def on_left_diagonals_triangles_handler(triangles):           
+        print("on LEFT diagonal:")            
+        for l, triangle in zip(range(1, old_order), triangles):
+            comb = old_order - l 
+            log(l, comb, triangle, rotate_clockwise(triangle))
+            covered_points.append(l)
 
+    def on_right_diagonals_triangles_handler(triangles):
+        print("on RIGHT diagonal:")            
+        right_diagonal = [r for r in np.cumsum([old_order+1] + list(range(old_order,2,-1)))]
+        for (ri, r), triangle in zip(enumerate(right_diagonal), triangles):
+            comb = right_diagonal[-(ri+1)] 
+            log(r, comb, triangle, rotate_clockwise(triangle))
+            covered_points.append(r)
+
+    def on_bottom_diagonals_triangles_handler(triangles):
+        print("on BOTTOM diagonal:")            
+        bottom_diagonal = [b for b in np.cumsum([2*old_order] + list(range(old_order-1,1,-1)))]
+        for (bi, b), triangle in zip(enumerate(bottom_diagonal), triangles):
+            comb = bottom_diagonal[-(bi+1)]
+            log(b, comb, triangle, rotate_clockwise(triangle))
+            covered_points.append(b)
+
+    upside_down_triangles_handler(partitioned_triangles['upside_down']) 
+    on_left_diagonals_triangles_handler(partitioned_triangles['on_left_inv_diagonal'])
+    on_right_diagonals_triangles_handler(partitioned_triangles['on_right_diagonal'])
+    on_bottom_diagonals_triangles_handler(partitioned_triangles['on_bottom_diagonal'])
+
+    covered_points.append(0)
+    covered_points.append(old_order)
+    covered_points.append(int((old_order+1)*(old_order+2)/2)-1)
+    
+    assert sorted(covered_points) == list(range(int((old_order+1)*(old_order+2)/2)))
+    print("assertion satisfied: all new points are covered")
+
+    return new_order, augmented_control_net
 
 
 
