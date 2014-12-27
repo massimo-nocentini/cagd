@@ -345,7 +345,7 @@ def de_casteljau(order, control_net, ntab=None, triangulation=None, subdivision=
 
 #_______________________________________________________________________
 
-def degree_elevation(order, control_net):
+def degree_elevation(order, control_net, print_logs=False):
     """
     Produces an augmented control net to interpolate the same surface but with increased degree.
     """
@@ -384,7 +384,7 @@ control point position {} is under assignment
 from combination coordinate {} 
 using upside down triangle {} (rotated clockwise {})
         """
-        print(log.format(*args))
+        if print_logs: print(log.format(*args))
 
     def barycentric_combine(triangle):
         
@@ -411,7 +411,7 @@ using upside down triangle {} (rotated clockwise {})
         t = 0
         barycentric_combination = None
         for top_most_vertex_in_right_diagonal_triangles, forward_offset in zip(
-                np.cumsum([old_order + 2] + list(range(old_order,old_order-2 -1,-1))),
+                np.cumsum([old_order + 2] + list(range(old_order,3,-1))),
                 range(old_order-2, 0, -1)): 
 
             print("start of diagonal iteration on upside down triangles for control point position {}, with forward offset {}:".
@@ -434,6 +434,8 @@ using upside down triangle {} (rotated clockwise {})
         for l, triangle in zip(range(1, old_order), triangles):
             comb = old_order - l 
             log(l, comb, triangle, rotate_clockwise(triangle))
+            barycentric_combination = barycentric_combine(triangle)
+            augmented_control_net[:, l] = barycentric_combination[:, comb]
             covered_points.append(l)
 
     def on_right_diagonals_triangles_handler(triangles):
@@ -442,6 +444,8 @@ using upside down triangle {} (rotated clockwise {})
         for (ri, r), triangle in zip(enumerate(right_diagonal), triangles):
             comb = right_diagonal[-(ri+1)] 
             log(r, comb, triangle, rotate_clockwise(triangle))
+            barycentric_combination = barycentric_combine(triangle)
+            augmented_control_net[:, r] = barycentric_combination[:, comb]
             covered_points.append(r)
 
     def on_bottom_diagonals_triangles_handler(triangles):
@@ -450,6 +454,8 @@ using upside down triangle {} (rotated clockwise {})
         for (bi, b), triangle in zip(enumerate(bottom_diagonal), triangles):
             comb = bottom_diagonal[-(bi+1)]
             log(b, comb, triangle, rotate_clockwise(triangle))
+            barycentric_combination = barycentric_combine(triangle)
+            augmented_control_net[:, b] = barycentric_combination[:, comb]
             covered_points.append(b)
 
     upside_down_triangles_handler(partitioned_triangles['upside_down']) 
@@ -457,11 +463,18 @@ using upside down triangle {} (rotated clockwise {})
     on_right_diagonals_triangles_handler(partitioned_triangles['on_right_diagonal'])
     on_bottom_diagonals_triangles_handler(partitioned_triangles['on_bottom_diagonal'])
 
+    augmented_control_net[:, 0] = control_net[:, 0]
+    augmented_control_net[:, old_order] = control_net[:, old_order - 1]
+    augmented_control_net[:, -1] = control_net[:, -1] 
+
     covered_points.append(0)
     covered_points.append(old_order)
     covered_points.append(int((old_order+1)*(old_order+2)/2)-1)
     
-    assert sorted(covered_points) == list(range(int((old_order+1)*(old_order+2)/2)))
+    assert sorted(covered_points) == list(range(int((old_order+1)*(old_order+2)/2))), (
+        "order: {}\ncovered_points: {}\nexpected points: {}".format(
+            order, sorted(covered_points), list(range(int((old_order+1)*(old_order+2)/2)))))
+
     print("assertion satisfied: all new points are covered")
 
     return new_order, augmented_control_net
