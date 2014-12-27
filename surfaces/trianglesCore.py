@@ -342,3 +342,53 @@ def de_casteljau(order, control_net, ntab=None, triangulation=None, subdivision=
     if subdivision: results += ((left_subpatch, right_subpatch, bottom_subpatch),)
 
     return results
+
+#_______________________________________________________________________
+
+def degree_elevation(order, control_net):
+    """
+    Produces an augmented control net to interpolate the same surface but with increased degree.
+    """
+
+    d, ntot = np.shape(control_net)
+    old_order = order
+    new_order = old_order + 1
+
+    tri, U, partitioned_triangles = u_bar(ntab=old_order, triangles_partitions=True)
+
+    _, N = np.shape(U)
+
+    sandbox = np.zeros((d, N, ntot))
+
+    augmented_control_net = np.empty((d, new_order))
+
+    def foreach_dimension(func):
+        for di in range(d): func(di)
+
+    def initialize_sandbox_with_control_points(di): 
+        sandbox[di,:,:] = np.ones((N,1)) * control_net[di,:]    
+
+    foreach_dimension(initialize_sandbox_with_control_points)
+  
+    for top_most_vertex_in_right_diagonal_triangles, forward_offset in zip(
+            np.cumsum([old_order + 2] + list(range(old_order,old_order-2 -1,-1))),
+            range(old_order-2, 0, -1)): 
+
+        print("(top_most_vertex_in_right_diagonal_triangles, forward_offset): ", 
+            top_most_vertex_in_right_diagonal_triangles, forward_offset)
+
+        for k, comb in zip([top_most_vertex_in_right_diagonal_triangles + i 
+                        for i in range(forward_offset)],
+                     np.cumsum([old_order+1+forward_offset] + list(range(old_order-1,old_order-forward_offset,-1)))): 
+
+            print("should assign combination to augmented control net index: ", k, comb)
+            
+ 
+
+
+
+
+
+
+
+
