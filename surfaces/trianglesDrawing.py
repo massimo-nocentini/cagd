@@ -4,6 +4,8 @@ import matplotlib
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
+import trianglesCore as tc
+
 def draw(*surfaces, figure_size_tuple=(15,15)):
 
     sizex, sizey = figure_size_tuple
@@ -25,21 +27,20 @@ def draw(*surfaces, figure_size_tuple=(15,15)):
     return fig, ax
 
 
-def repeat_degree_elevation(control_net, snapshots=None, degrees=None, formatting_string="Order {}:")
+def draw_repeated_degree_elevation(
+    control_net, snapshots=None, degrees=None, formatting_string="Order {}:"):
    
-    assert snapshots is not None and degrees is not None, 
-        "Or number of snapshots or degrees list must be supplied, but not both."
-    
     order, control_net = control_net
 
     if snapshots:
         def drawer(print_handler):
+            nonlocal order, control_net
             runs = 2
             snapshots_list = [int(np.ceil(l)) for l in np.logspace(0,runs,num=snapshots)]
             s = 0
             for i in range(1, (10**runs)+1):
                 order, control_net = tc.degree_elevation(order, control_net)
-                if i == snapshots[s]:
+                if i == snapshots_list[s]:
                     print_handler(order)
                     s += 1
 
