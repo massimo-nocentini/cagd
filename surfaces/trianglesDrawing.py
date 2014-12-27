@@ -43,6 +43,21 @@ def draw_repeated_degree_elevation(
                 if i == snapshots_list[s]:
                     print_handler(order)
                     s += 1
+    elif degrees:
+        def drawer(print_handler):
+            nonlocal order, control_net, degrees
+            degrees = sorted(degrees)
+
+            for d, degree in enumerate(degrees):
+                if degree > order-1: break
+
+            for i in range(max(degrees)+1):
+                order, control_net = tc.degree_elevation(order, control_net)
+                if order-1 is degrees[d]:
+                    print_handler(order)
+                    d += 1
+                    if d == len(degrees): break
+                
 
     def print_handler(order):
 
