@@ -7,7 +7,9 @@ def u_bar(ntab, return_multi_indices_matrix=False, triangles_partitions=False):
 
     Each point in the produced set is represented in baricentric 
     coordinate form. Also, a set of triangles is produced and, if desired,
-    the matrix of multi indices is produced too.
+    the matrix of multi indices is produced too. Moreover, triangles 
+    are partitioned into sets about their relative `position` respect
+    the given domain triangle.
 
     Observe that triangles set is quite different from the one produced
     by Matplotlib (which does use Delaunay algorithm?), and it is based 
@@ -15,15 +17,36 @@ def u_bar(ntab, return_multi_indices_matrix=False, triangles_partitions=False):
 
     Consumes
     ========
+
     ntab    number of subinterval in each side of triangle domain 
             (ie, the parametric domain). Observe that on each tringle line
             will lie `ntab+1` points.
 
     return_multi_indices_matrix     
-            `True` will include multi indices matrix in tuple result.
+            `True` will include multi indices matrix in tuple result, 
+            defaults to `False`.
+
+    triangles_partitions
+            `True` will include triangles partitions in tuple result, 
+            in particular the produced partitions are structured as
+            a plain dictionary with keys such that:
+                * `upside`, list of triangles in `upside` representation, ie.
+                    with one vertex on top and the other two vertices aligned
+                    at bottom.
+                * `upside_down`, list of triangles in `reversed` representation, ie.
+                    with two vertices aligned on top and the last one on bottom. Those
+                    triangles are all internal to the given domain triangle and are
+                    most important for *degree elevation* algorithm.
+                * `on_left_inv_diagonal`, list of triangles lying on the outermost inverse
+                    left diagonal of the given domain triangle.
+                * `on_right_diagonal`, list of triangles lying on the outermost 
+                    right diagonal of the given domain triangle.
+                * `on_bottom_diagonal`, list of triangles lying on the outermost
+                    bottom diagonal of the given domain triangle.
 
     Produces
     ========
+
     tri     triangulation matrix of dimension `(ntab^2)x3`, 
             observe that `ntab^2` is the number of triangles within the domain.
 
@@ -34,6 +57,10 @@ def u_bar(ntab, return_multi_indices_matrix=False, triangles_partitions=False):
     multi_indices_matrix
             multi indices matrix of internal points (ie, triangles extrema), 
             returned if argument `return_multi_indices_matrix` is `True`.
+
+    partitioned_triangles
+            dictionary of triangles partitions, returned if argument 
+            `triangles_partitions` is `True`. 
 
     Examples
     ========
@@ -109,7 +136,7 @@ def u_bar(ntab, return_multi_indices_matrix=False, triangles_partitions=False):
     multi_indices_matrix = np.copy(U) # just have a copy of multi indices
     U /= ntab # make the matrix represent baricentric coordinates
 
-    # the following lists allow to partition triangles
+    # the following dictionary saves triangles partitions
     partitioned_triangles = {
         'upside':[],
         'upside_down':[],
@@ -173,10 +200,16 @@ def u_bar(ntab, return_multi_indices_matrix=False, triangles_partitions=False):
 
 #_______________________________________________________________________
 
-def de_casteljau(order, control_net, ntab=None, triangulation=None, subdivision=False):
+def de_casteljau(   order, control_net, 
+                    ntab=None, triangulation=None, subdivision=False):
     """
     Produces a triangular Bezier patch over a baricentric coordinate set.
 
+    This function implements de Casteljau algorithm for 3D patches, moreover
+    it is able to produce a valid subdivision, returning three control nets
+    with the same shape and with the same order of the original control net. 
+
+    _Implementation note_
     For now we don't care about functional case, for more about that a porting
     of Sestini's implementation is pending.
 
@@ -196,11 +229,22 @@ def de_casteljau(order, control_net, ntab=None, triangulation=None, subdivision=
             If `None`, a triangulation pair is obtained using `u_bar` function,
             in this case that computed pair is included in the returned result tuple.    
 
+    subdivision
+            `True` if three more control nets are included in result tuple,
+            each for a subpatch of the comprehensive patch.
+
     Produces
     ========
     surface 
             A matrix of points on the triangular Bezier patch, with form 
             `d x ((ntab+1)*(ntab+2)/2)`, the same as baricentric coordinate matrix
+
+    (left_subpatch, right_subpatch, bottom_subpatch)   
+            three control nets obtained by subdivision algorithm applied to
+            the given control net, they can be used as arguments for other
+            functions defined in our modules which consume a control net
+            (ie, their use is transparent respect our APIs).
+                
     """
 
     n = order-1
@@ -219,7 +263,6 @@ def de_casteljau(order, control_net, ntab=None, triangulation=None, subdivision=
     else:
 #       we unpack with a collecting `rest`...
         tri, U, *rest = triangulation 
-        
 #       ...and do some dimensional checks
         _n, N = np.shape(U)
         T, t = np.shape(tri)
@@ -348,6 +391,36 @@ def de_casteljau(order, control_net, ntab=None, triangulation=None, subdivision=
 def degree_elevation(order, control_net, print_logs=False):
     """
     Produces an augmented control net to interpolate the same surface but with increased degree.
+
+    This function implement *degree elevation* algorithm following a general idea
+    but not a template implementation to follow. We take insights and gain clarity
+    from the general implementation of *de Casteljau* Sestini's implementation.
+    It does produce an augmented control net such that, repeating degree elevation
+    to infinity, the augmented control points takes the real curve shape.
+
+    It is best used for drawing a scatter plot of the control net, instead
+    to draw a triangular tassellation to get a patch shape.
+    
+    Consumes
+    ========
+
+    order   The order of the original patch we start from.
+
+    control_net
+            Array of control points represented as a matrix
+
+    print_logs
+            `True` to print debugging lines about which point and triangles
+            are considered in the various steps
+
+    Produces
+    ========
+
+    new_order
+            Increased order (by one)
+
+    augmented_control_net
+            Augmented control net which refine the given one
     """
 
     d, ntot = np.shape(control_net)
@@ -399,17 +472,10 @@ using upside down triangle {} (rotated clockwise {})
 
         foreach_dimension(update_surface)
 
-#       Why not the following?
-        #first_row   = np.multiply(U, sandbox[:, :, ind1])
-        #second_row  = np.multiply(U, sandbox[:, :, ind2])
-        #third_row   = np.multiply(U, sandbox[:, :, ind3])
-        #barycentric_comb = first_row + second_row + third_row
-
         return barycentric_comb
 
     def upside_down_triangles_handler(triangles):
         t = 0
-        barycentric_combination = None
         for top_most_vertex_in_right_diagonal_triangles, forward_offset in zip(
                 np.cumsum([old_order + 2] + list(range(old_order,3,-1))),
                 range(old_order-2, 0, -1)): 
