@@ -22,7 +22,7 @@ def draw(*surfaces, figure_size_tuple=(15,15)):
     for surface, triangles in surfaces:
         x, y, z = surface[0,:],surface[1,:],surface[2,:]
         ax.plot_trisurf(x, y, z, 
-                        triangles=triangles, cmap=plt.cm.Spectral)#, edgecolor='none')
+                        triangles=triangles, cmap=plt.cm.Spectral, edgecolor='none')
 
     return fig, ax
 
@@ -79,4 +79,4 @@ def draw_repeated_degree_elevation(
 
     drawer(print_handler) # finally draw some pictures
 
-
+    return order, control_net

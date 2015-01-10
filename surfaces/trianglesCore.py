@@ -256,7 +256,7 @@ def de_casteljau(   order, control_net,
     def foreach_dimension(func):
         for di in range(d): func(di)
 
-    if ntab is None: ntab = 2*n # double the number of control points for "tabulation"
+    if ntab is None: ntab = n # double the number of control points for "tabulation"
 
     if triangulation is None: 
         tri, U, multi_indices_matrix = u_bar(ntab, return_multi_indices_matrix=True)

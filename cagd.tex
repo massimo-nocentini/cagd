@@ -3,14 +3,14 @@
 \usepackage[nochapters]{classicthesis} % nochapters
 
 %\usepackage{inputenc}
-\usepackage[T1]{fontenc} 
-\usepackage[square,numbers]{natbib} 
+\usepackage[T1]{fontenc}
+\usepackage[square,numbers]{natbib}
 \usepackage{amsmath, amsthm, amssymb, amsfonts, tikz}
 \usetikzlibrary{snakes}
-% \newtheorem{definizione}{Definizione}  
+% \newtheorem{definizione}{Definizione}
 % \newtheorem{lemma}{Lemma}
-% \newtheorem{teorema}{Teorema}  
-% \newtheorem{proprieta}{Proprietà}  
+% \newtheorem{teorema}{Teorema}
+% \newtheorem{proprieta}{Proprietà}
 \usepackage{titletoc}
 \usepackage{verbatim}
 \usepackage{hyperref}
@@ -40,7 +40,7 @@
   a given set of exercises, the last one report the raw implementation
   code written in Julia \cite{Julia}.
 \end{abstract}
-       
+
 \tableofcontents
 
 \newpage
@@ -56,9 +56,9 @@ order. This plot was the first test for our implementation of code
 reported in Exercise 1 and requested in Exercise 2: it contains a
 segmented curve in green which is the control polygon, and a Bezier
 curve in red built using the given control points.
-\begin{figure}
+\begin{figure}[h!]
   \centering
-  \includegraphics{bezier-deCasteljau-curves/exercise-one}  
+  \includegraphics{bezier-deCasteljau-curves/exercise-one}
   \caption{Curve from simple set of control points}
   \label{fig:first-closed-curve}
 \end{figure}
@@ -71,7 +71,7 @@ specification:
   \left [  \begin{array}{c}
       x(u) \\
       y(u)
-    \end{array} \right ] = \left [  
+    \end{array} \right ] = \left [
     \begin{array}{c}
       1 + u + u^2 \\
       u^3
@@ -99,7 +99,7 @@ a:v0*(1-t)^3 + v1*3*t*(1-t)^2 + v2*3*(t^2)*(1-t) + v3*t^3;
 % %%% INPUT:
 % \begin{minipage}[t]{8ex}{\color{red}\bf
 % \begin{verbatim}
-% (%i2) 
+% (%i2)
 % \end{verbatim}}
 % \end{minipage}
 % \begin{minipage}[t]{\textwidth}{\color{blue}
@@ -129,7 +129,8 @@ b = 1 + t + t^2 + 0*t^3;
 \noindent
 %%% INPUT:
 \begin{verbatim}
-solve([coeff(b, t,3) = 0, coeff(b, t,2) = 1, coeff(b, t,1) = 1, coeff(b, t,0) = 1], [v0,v1,v2,v3]);
+solve([coeff(b, t,3) = 0, coeff(b, t,2) = 1, coeff(b, t,1) = 1,
+        coeff(b, t,0) = 1], [v0,v1,v2,v3]);
 \end{verbatim}}
 %%% OUTPUT:
 \definecolor{labelcolor}{RGB}{100,0,0}
@@ -189,10 +190,12 @@ b = t^3;
 %%%%%%%%%%%%%%%
 %%% INPUT:
 \begin{verbatim}
-solve([coeff(b, t,3) = 1, coeff(b, t,2) = 0, coeff(b, t,1) = 0, coeff(b, t,0) = 0], [y0,y1,y2,y3]);
+solve([coeff(b, t,3) = 1, coeff(b, t,2) = 0, coeff(b, t,1) = 0,
+        coeff(b, t,0) = 0], [y0,y1,y2,y3]);
 \end{verbatim}}
 %%% OUTPUT:
 \definecolor{labelcolor}{RGB}{100,0,0}
+
 \begin{math}\displaystyle
 \parbox{8ex}{\color{labelcolor}(\%o8) }
 [[y0=0,y1=0,y2=0,y3=1]]
@@ -215,7 +218,7 @@ control points with the same cardinality that, drawn together, build a
 Bezier that is the same as the original one. Those two sets are
 colored in green (the relative Bezier in magenta) and in blue (the
 relative Bezier in cyan), respectively.
-\begin{figure}
+\begin{figure}[h!]
   \centering
   \includegraphics{bezier-deCasteljau-curves/exercise-four}
   \caption{Splitted curve}
@@ -234,7 +237,7 @@ other Bezier: this can be explained from a probabilistic point of
 view, since a Bezier can be thought as a \emph{mean} of the control
 polygon, hence putting weight in $(10,1)$ increase the control point's
 weight.
-\begin{figure}
+\begin{figure}[h!]
   \centering
   \includegraphics{bezier-deCasteljau-curves/exercise-five}
   \caption{Repeating the control point $(10,1)$ three more times}
@@ -252,19 +255,22 @@ curve and, in \autoref{fig:increasing-degree-does-change-curve}, the
 Bezier curves relative to each augmented polygons doesn't change in
 shape, ie their drawn is the same as the original one (we simply plot
 those Bezier curves in the same plot and each one is over the others).
-\begin{figure}
+
+\begin{figure}[h!]
   \centering
   \includegraphics{bezier-deCasteljau-curves/exercise-six-original}
   \caption{Original curve before increasing degree}
   \label{fig:increasing-degree-original-curve}
 \end{figure}
-\begin{figure}
+
+\begin{figure}[h!]
   \centering
   \includegraphics{bezier-deCasteljau-curves/exercise-six-higher-degree-control-poly}
   \caption{Some control polygons, each one with one more degree}
   \label{fig:some-increased-degrees}
 \end{figure}
-\begin{figure}
+
+\begin{figure}[h!]
   \centering
   \includegraphics{bezier-deCasteljau-curves/exercise-six-one-more-degree-comparison}
   \caption{Increasing degree doesn't change the Bezier shape}
@@ -273,19 +279,62 @@ those Bezier curves in the same plot and each one is over the others).
 
 \subsection{Joining curve requiring $\mathcal{C}^0, \mathcal{C}^1, \mathcal{C}^2$}
 
-\includegraphics{bezier-deCasteljau-curves/exercise-seven-continuity}
-\includegraphics{bezier-deCasteljau-curves/exercise-seven-tangent}
-\includegraphics{bezier-deCasteljau-curves/exercise-seven-obsculating}
-\includegraphics{bezier-deCasteljau-curves/exercise-seven-a_succ_i}
-\includegraphics{bezier-deCasteljau-curves/exercise-seven-continuity-left}
-\includegraphics{bezier-deCasteljau-curves/exercise-seven-tangent-left}
-\includegraphics{bezier-deCasteljau-curves/exercise-seven-obsculating-left}
-\includegraphics{bezier-deCasteljau-curves/exercise-seven-a_i-left}
+In this section we report plots about Bezier spline curves, extending a fixed
+control net both on the right both on the left, requiring $\mathcal{C}^0, \mathcal{C}^1, \mathcal{C}^2$
+for each extension.
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics{bezier-deCasteljau-curves/exercise-seven-continuity}
+  \caption{Bezier spline curve, requiring $\mathcal{C}^0$, extending on the right}
+  \label{fig:increasing-degree-does-change-curve}
+\end{figure}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics{bezier-deCasteljau-curves/exercise-seven-tangent}
+  \caption{Bezier spline curve, requiring $\mathcal{C}^1$, extending on the right}
+  \label{fig:increasing-degree-does-change-curve}
+\end{figure}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics{bezier-deCasteljau-curves/exercise-seven-obsculating}
+  \caption{Bezier spline curve, requiring $\mathcal{C}^2$, extending on the right}
+  \label{fig:increasing-degree-does-change-curve}
+\end{figure}
+
+% \includegraphics{bezier-deCasteljau-curves/exercise-seven-a_succ_i}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics{bezier-deCasteljau-curves/exercise-seven-continuity-left}
+  \caption{Bezier spline curve, requiring $\mathcal{C}^0$, extending on the left}
+  \label{fig:increasing-degree-does-change-curve}
+\end{figure}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics{bezier-deCasteljau-curves/exercise-seven-tangent-left}
+  \caption{Bezier spline curve, requiring $\mathcal{C}^1$, extending on the left}
+  \label{fig:increasing-degree-does-change-curve}
+\end{figure}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics{bezier-deCasteljau-curves/exercise-seven-obsculating-left}
+  \caption{Bezier spline curve, requiring $\mathcal{C}^2$, extending on the left}
+  \label{fig:increasing-degree-does-change-curve}
+\end{figure}
+
+% \includegraphics{bezier-deCasteljau-curves/exercise-seven-a_i-left}
+
+\newpage
 
 \subsection{First Polar of a Bezier curve}
 
 In this section we elaborate an extra exercise relative to first derivative
-of a Bezier curve and the first step of de Casteljau algorithm. 
+of a Bezier curve and the first step of de Casteljau algorithm.
 
 Let $\mathbf{p}_{1}(t)$ a Bezier curve built over a control net with $n$ points
 $\mathbf{b}_{0}^{(1)},\ldots,\mathbf{b}_{n-1}^{(1)}$, respect a fixed parameter $\hat{t}$
@@ -293,42 +342,43 @@ after one step of de Casteljau algorithm. Just use the formal definition:
 \begin{displaymath}
     \begin{split}
         \mathbf{p}_{1,\hat{t}}(t)  &= \sum_{i=0}^{n-1}{\mathbf{b}_{i}^{(1)}(\hat{t})B_{i}^{n-1}(t)} \\
-            &=  \sum_{i=0}^{n-1}{\left( (1-\hat{t})\mathbf{b}_{i}^{(0)} + 
+            &=  \sum_{i=0}^{n-1}{\left( (1-\hat{t})\mathbf{b}_{i}^{(0)} +
                 \hat{t}\mathbf{b}_{i+1}^{(0)}\right)B_{i}^{n-1}(t)} \\
-            &=  \sum_{i=0}^{n-1}{\left( (1-\hat{t})\mathbf{b}_{i}^{(0)} + 
-                \hat{t}\mathbf{b}_{i+1}^{(0)} -\left( (1-t)\mathbf{b}_{i}^{(0)} + 
-                t\mathbf{b}_{i+1}^{(0)}\right)\right)B_{i}^{n-1}(t)} + 
+            &=  \sum_{i=0}^{n-1}{\left( (1-\hat{t})\mathbf{b}_{i}^{(0)} +
+                \hat{t}\mathbf{b}_{i+1}^{(0)} -\left( (1-t)\mathbf{b}_{i}^{(0)} +
+                t\mathbf{b}_{i+1}^{(0)}\right)\right)B_{i}^{n-1}(t)} +
                 \sum_{i=0}^{n-1}{\mathbf{b}_{i}^{(1)}(t)B_{i}^{n-1}(t)} \\
-            &=  \sum_{i=0}^{n-1}{\left( (t-\hat{t})\mathbf{b}_{i}^{(0)} + 
-                (\hat{t}-t)\mathbf{b}_{i+1}^{(0)}\right)B_{i}^{n-1}(t)} + 
+            &=  \sum_{i=0}^{n-1}{\left( (t-\hat{t})\mathbf{b}_{i}^{(0)} +
+                (\hat{t}-t)\mathbf{b}_{i+1}^{(0)}\right)B_{i}^{n-1}(t)} +
                 \sum_{i=0}^{n-1}{\mathbf{b}_{i}^{(1)}(t)B_{i}^{n-1}(t)} \\
-            &=  (\hat{t}-t)\sum_{i=0}^{n-1}{\left( 
-                \mathbf{b}_{i+1}^{(0)} - \mathbf{b}_{i}^{(0)}\right)B_{i}^{n-1}(t)} + 
+            &=  (\hat{t}-t)\sum_{i=0}^{n-1}{\left(
+                \mathbf{b}_{i+1}^{(0)} - \mathbf{b}_{i}^{(0)}\right)B_{i}^{n-1}(t)} +
                 \sum_{i=0}^{n-1}{\mathbf{b}_{i}^{(1)}(t)B_{i}^{n-1}(t)} \\
     \end{split}
 \end{displaymath}
-where, with little abuse of notation, $\mathbf{b}_{i}^{(1)}(t) = 
+where, with little abuse of notation, $\mathbf{b}_{i}^{(1)}(t) =
 \left( (1-t)\mathbf{b}_{i}^{(0)} + t\mathbf{b}_{i+1}^{(0)}\right)$.
-Recall that $n\sum_{i=0}^{n-1}{\left( 
+Recall that $n\sum_{i=0}^{n-1}{\left(
 \mathbf{b}_{i+1}^{(0)} - \mathbf{b}_{i}^{(0)}\right)B_{i}^{n-1}(t)}$ is the
 first derivative of a Bezier curve, hence:
 \begin{displaymath}
     \begin{split}
-        \mathbf{p}_{1, \hat{t}}(t)  &= \mathbf{b}_{1, t}(t) + 
-        \frac{\hat{t}-t}{n}\frac{\partial \mathbf{b}_{0, \hat{t}}(t) }{\partial t} 
+        \mathbf{p}_{1, \hat{t}}(t)  &= \mathbf{b}_{1, t}(t) +
+        \frac{\hat{t}-t}{n}\frac{\partial \mathbf{b}_{0, \hat{t}}(t) }{\partial t}
     \end{split}
 \end{displaymath}
 So, this is called the ``first polar form'' of Bezier curve $\mathbf{b}_{0, \hat{t}}(t)$
 respect parameter $\hat{t}$. Geometrically, the term $\mathbf{b}_{1, t}(t)$ is an affine
 combination of points $\mathbf{b}_{0}^{(0)},\ldots,\mathbf{b}_{n}^{(0)}$ respect parameter
-$t$ (not $\hat{t}$), hence it is a point also; the term 
+$t$ (not $\hat{t}$), hence it is a point also; the term
         $\frac{\hat{t}-t}{n}\frac{\partial \mathbf{b}_{0, \hat{t}}(t) }{\partial t} $
 is a vector, so $\mathbf{p}_{1, \hat{t}}(t)$ is a vector applied to a point, yielding a point
 as required. It is quite interesting how the polar form combine a point produced using $t$
 as parameter with the derivative vector produced using  parameter $\hat{t}$. This derivation
 comes from \cite{Farin}, page 73, and we report the output of our implementation in
 \autoref{fig:exercise-polar-form}.
-\begin{figure}
+
+\begin{figure}[h!]
   \centering
   \includegraphics{bezier-deCasteljau-curves/exercise-polar}
   \caption{Polar form of a Bezier curve}
@@ -340,21 +390,21 @@ comes from \cite{Farin}, page 73, and we report the output of our implementation
 \section{B-Splines}
 
 \subsection{Mushrooms from clumped, uniformed and closed partitions}
-\begin{figure}
+\begin{figure}[h!]
   \centering
   \includegraphics{b-splines/exercise-zero-clumped.eps}
   \caption{Mushroom from clumped partition}
   \label{fig:clumpled-mushroom}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[h!]
   \centering
   \includegraphics{b-splines/exercise-zero-uniformed.eps}
   \caption{Mushroom from uniformed partition}
   \label{fig:uniformed-mushroom}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[h!]
   \centering
   \includegraphics{b-splines/exercise-zero-closed.eps}
   \caption{Mushroom from closed partition}
@@ -362,7 +412,7 @@ comes from \cite{Farin}, page 73, and we report the output of our implementation
 \end{figure}
 
 \subsection{Increasing order $k$ while decreasing \emph{continuity} vector }
-\begin{figure}
+\begin{figure}[h!]
   \centering
   \includegraphics{b-splines/exercise-one-clumped.eps}
   \caption{Decreasing the \emph{continuity} vector collapsing in a Bezier }
@@ -370,7 +420,7 @@ comes from \cite{Farin}, page 73, and we report the output of our implementation
 \end{figure}
 
 \subsection{Knots' multiplicities against the same control polygon}
-\begin{figure}
+\begin{figure}[h!]
   \centering
   \includegraphics{b-splines/exercise-two.eps}
   \caption{Knots's multiplicities increased against the same control polygon }
@@ -378,7 +428,7 @@ comes from \cite{Farin}, page 73, and we report the output of our implementation
 \end{figure}
 
 \subsection{Linearity near doubled control point with a clumped partition}
-\begin{figure}
+\begin{figure}[h!]
   \centering
   \includegraphics{b-splines/exercise-three.eps}
   \caption{Linearity toward $(1,1)$ due to ``linearized'' convex hull}
@@ -386,7 +436,7 @@ comes from \cite{Farin}, page 73, and we report the output of our implementation
 \end{figure}
 
 \subsection{Two clumped partitions, different \emph{continuity} vectors and same control polygon}
-\begin{figure}
+\begin{figure}[h!]
   \centering
   \includegraphics{b-splines/exercise-four.eps}
   \caption{Same control polygon with doubled $(0,6)$ againts two clumped partitions}
@@ -394,7 +444,7 @@ comes from \cite{Farin}, page 73, and we report the output of our implementation
 \end{figure}
 
 \subsection{Increasing clumped partitions for increasing occurrences of a control point}
-\begin{figure}
+\begin{figure}[h!]
   \centering
   \includegraphics{b-splines/exercise-five.eps}
   \caption{Three B-Splines, each for $1,2,3$ occurrences of $(0,1)$ respectively }
@@ -402,14 +452,14 @@ comes from \cite{Farin}, page 73, and we report the output of our implementation
 \end{figure}
 
 \subsection{Two B-Splines from two closed partitions}
-\begin{figure}
+\begin{figure}[h!]
   \centering
   \includegraphics{b-splines/exercise-six-first-closed.eps}
   \caption{A first B-Spline from a closed partition }
   \label{fig:bspline-exercise-six-first}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[h!]
   \centering
   \includegraphics{b-splines/exercise-six-second-closed.eps}
   \caption{A second B-Spline from a closed partition }
