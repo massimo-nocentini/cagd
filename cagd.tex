@@ -48,8 +48,8 @@
 \section{Bezier curves}
 
 \subsection{Curve from simple set of control points}
-In \autoref{fig:first-closed-curve} we report the very first curve
-obtained using our implementation reported in
+In \autoref{fig:first-closed-curve} we report the very first Bezier
+curve obtained using our implementation reported in
 \autoref{sec:deCasteljau-code}. The curve is obtained using control
 points $(1,1), (3,4), (5,6),(7,8),(10,2),(1,1)$ in the given
 order. This plot was the first test for our implementation of code
@@ -213,11 +213,13 @@ Hence four control points are $\{(1,0), (\frac{3}{4},0), (2,0),
 
 \subsection{Splitted curve on a given parameter $u$}
 As required in Exercise 4, in \autoref{fig:splitted-curve} we report
-the control polygon, in red, for the original curve and two sets of
-control points with the same cardinality that, drawn together, build a
-Bezier that is the same as the original one. Those two sets are
-colored in green (the relative Bezier in magenta) and in blue (the
-relative Bezier in cyan), respectively.
+the control polygon for the original curve in red, and two sets of
+control points with the same cardinality that, used together, build a
+Bezier that is the same as the original one. Those sets of points are
+obtained via subdivision algorithm (which is a clever implementation of
+classic \emph{de Casteljau algorithm}) fixing parameter $\hat{t} =
+\frac{1}{4}$: they are colored in green (the relative Bezier in magenta)
+and in blue (the relative Bezier in cyan), respectively.
 \begin{figure}[h!]
   \centering
   \includegraphics{bezier-deCasteljau-curves/exercise-four}
@@ -227,16 +229,16 @@ relative Bezier in cyan), respectively.
 
 \subsection{Repeating the same control point more times}
 As required in Exercise 5, in
-\autoref{fig:repeating-same-control-point} we report two Bezier: the
+\autoref{fig:repeating-same-control-point} we report two Bezier curves: the
 red one relative to control points $\{(2,4), (6,12), (10,1),
 (12,12)\}$ the green one relative to control points $\{(2,4), (6,12),
 (10,1), (10,1), (10,1), (10,1), (12,12)\}$, ie. with the point
-$(10,1)$ repeated three more times. We see that the Bezier relative to
+$(10,1)$ repeated three more times. We see that curve relative to
 the augmented control polygon goes down toward $(10,1)$ more than the
-other Bezier: this can be explained from a probabilistic point of
-view, since a Bezier can be thought as a \emph{mean} of the control
-polygon, hence putting weight in $(10,1)$ increase the control point's
-weight.
+other curve: this can be explained from a probabilistic point of
+view, since a Bezier curve can be thought as a \emph{mean} of the control
+polygon, hence repeating point $(10,1)$ increases its weight.
+
 \begin{figure}[h!]
   \centering
   \includegraphics{bezier-deCasteljau-curves/exercise-five}
@@ -247,13 +249,13 @@ weight.
 \subsection{Increasing degree}
 As required in Exercise 6, we start from an original set of control
 points, plotted in \autoref{fig:increasing-degree-original-curve}, and
-we proceed by increasing the degree three times. We obtains three
-augmented set of control points, plotted in
+we proceed by increasing degrees of successive Bezier curves three times.
+We obtains three augmented set of control points, plotted in
 \autoref{fig:some-increased-degrees}, respectively. It is possible to
 check the slow convergence for the sequence of polygons to the Bezier
 curve and, in \autoref{fig:increasing-degree-does-change-curve}, the
 Bezier curves relative to each augmented polygons doesn't change in
-shape, ie their drawn is the same as the original one (we simply plot
+shape, ie their set of points equal the original one (we simply plot
 those Bezier curves in the same plot and each one is over the others).
 
 \begin{figure}[h!]
@@ -279,29 +281,38 @@ those Bezier curves in the same plot and each one is over the others).
 
 \subsection{Joining curve requiring $\mathcal{C}^0, \mathcal{C}^1, \mathcal{C}^2$}
 
-In this section we report plots about Bezier spline curves, extending a fixed
-control net both on the right both on the left, requiring $\mathcal{C}^0, \mathcal{C}^1, \mathcal{C}^2$
-for each extension.
+In this section we report plots about Bezier spline curves,
+extending a fixed control net, requiring $\mathcal{C}^0,
+\mathcal{C}^1, \mathcal{C}^2$ for each extension, both on the right
+(see
+\autoref{fig:bezier-spline-right-extension-continuity},
+\autoref{fig:bezier-spline-right-extension-tangent},
+\autoref{fig:bezier-spline-right-extension-obsculating},
+respectively) both on the left (see
+\autoref{fig:bezier-spline-left-extension-continuity},
+\autoref{fig:bezier-spline-left-extension-tangent},
+\autoref{fig:bezier-spline-left-extension-obsculating},
+respectively).
 
 \begin{figure}[h!]
   \centering
   \includegraphics{bezier-deCasteljau-curves/exercise-seven-continuity}
   \caption{Bezier spline curve, requiring $\mathcal{C}^0$, extending on the right}
-  \label{fig:increasing-degree-does-change-curve}
+  \label{fig:bezier-spline-right-extension-continuity}
 \end{figure}
 
 \begin{figure}[h!]
   \centering
   \includegraphics{bezier-deCasteljau-curves/exercise-seven-tangent}
   \caption{Bezier spline curve, requiring $\mathcal{C}^1$, extending on the right}
-  \label{fig:increasing-degree-does-change-curve}
+  \label{fig:bezier-spline-right-extension-tangent}
 \end{figure}
 
 \begin{figure}[h!]
   \centering
   \includegraphics{bezier-deCasteljau-curves/exercise-seven-obsculating}
   \caption{Bezier spline curve, requiring $\mathcal{C}^2$, extending on the right}
-  \label{fig:increasing-degree-does-change-curve}
+  \label{fig:bezier-spline-right-extension-obsculating}
 \end{figure}
 
 % \includegraphics{bezier-deCasteljau-curves/exercise-seven-a_succ_i}
@@ -310,21 +321,21 @@ for each extension.
   \centering
   \includegraphics{bezier-deCasteljau-curves/exercise-seven-continuity-left}
   \caption{Bezier spline curve, requiring $\mathcal{C}^0$, extending on the left}
-  \label{fig:increasing-degree-does-change-curve}
+  \label{fig:bezier-spline-left-extension-continuity}
 \end{figure}
 
 \begin{figure}[h!]
   \centering
   \includegraphics{bezier-deCasteljau-curves/exercise-seven-tangent-left}
   \caption{Bezier spline curve, requiring $\mathcal{C}^1$, extending on the left}
-  \label{fig:increasing-degree-does-change-curve}
+  \label{fig:bezier-spline-left-extension-tangent}
 \end{figure}
 
 \begin{figure}[h!]
   \centering
   \includegraphics{bezier-deCasteljau-curves/exercise-seven-obsculating-left}
   \caption{Bezier spline curve, requiring $\mathcal{C}^2$, extending on the left}
-  \label{fig:increasing-degree-does-change-curve}
+  \label{fig:bezier-spline-left-extension-obsculating}
 \end{figure}
 
 % \includegraphics{bezier-deCasteljau-curves/exercise-seven-a_i-left}
@@ -381,7 +392,7 @@ comes from \cite{Farin}, page 73, and we report the output of our implementation
 \begin{figure}[h!]
   \centering
   \includegraphics{bezier-deCasteljau-curves/exercise-polar}
-  \caption{Polar form of a Bezier curve}
+  \caption{First Polar form of a Bezier curve}
   \label{fig:exercise-polar-form}
 \end{figure}
 
