@@ -398,27 +398,39 @@ comes from \cite{Farin}, page 73, and we report the output of our implementation
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{B-Splines}
+\newpage
+
+\section{B-Splines curves}
 
 \subsection{Mushrooms from clumped, uniformed and closed partitions}
+
+In this section we report three simple BSpline curves, using
+three different knots partitions: \emph{clumped, uniform} and
+\emph{cyclic} (see \autoref{fig:clumpled-mushroom},
+    \autoref{fig:uniformed-mushroom} and \autoref{fig:closed-mushroom}
+respectively). The control polygon doesn't change
+  and aims to produce a mushroom in cartoon style, each knot
+has multiplicity $1$ (so maximum continuity is required in each junction)
+and no control point is repeated.
+
 \begin{figure}[h!]
   \centering
   \includegraphics{b-splines/exercise-zero-clumped.eps}
-  \caption{Mushroom from clumped partition}
+  \caption{Mushroom from clumped knots partition}
   \label{fig:clumpled-mushroom}
 \end{figure}
 
 \begin{figure}[h!]
   \centering
   \includegraphics{b-splines/exercise-zero-uniformed.eps}
-  \caption{Mushroom from uniformed partition}
+  \caption{Mushroom from uniformed knots partition}
   \label{fig:uniformed-mushroom}
 \end{figure}
 
 \begin{figure}[h!]
   \centering
   \includegraphics{b-splines/exercise-zero-closed.eps}
-  \caption{Mushroom from closed partition}
+  \caption{Mushroom from cyclic knots partition}
   \label{fig:closed-mushroom}
 \end{figure}
 
