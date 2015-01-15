@@ -474,6 +474,33 @@ Finally, the very last partition allow to draw a \emph{Bezier} curve (the yellow
 \end{figure}
 
 \subsection{Knots' multiplicities against the same control polygon}
+In \autoref{fig:bspline-exercise-two} we report plots required by Exercise 2.
+This composite picture contains 5 curves according the following specifications,
+from top to bottom:
+\begin{center}
+    \begin{tabular}{ c c }
+        order & knots partition \\
+        \hline
+        4 & $\lbrace 0^{4},1,2,3,4,5,6,7,8,9,10 \rbrace$  \\
+        4 & $\lbrace 0^{4},1^{2},2^{2},3^{2},4^{4} \rbrace$  \\
+        6 & $\lbrace 0^{6},1,2,3,4,5^{6} \rbrace$  \\
+        6 & $\lbrace 0^{6},1,2,3^{2},4^{6} \rbrace$  \\
+        8 & $\lbrace 0^{8},1,2,3^{8} \rbrace$  \\
+    \end{tabular}
+\end{center}
+The curve relative to the first row interpolate the first control point
+since $0$ has multiplicity $4$ which is the curve's order, while the last
+control point isn't interpolated since knots partition ends uniformly.
+
+The curve relative to the second row both interpolate the first control
+point due to the multiplicity $k$ of $0$ and is tangent to control net
+on the direction $\mathbf{V}_{4} - \mathbf{V}_{3}$ since for $t \in [t_{5}, t_{6}]$
+the support is $[t_{2},t_{3},t_{4},t_{5}]$, where $0$ has multiplicity $3 = order -1$.
+
+Curves relative to third and forth rows both interpolate first and last control
+points because of clumped partition, while the last one reduce to only two
+knots $1,2$, toward Bezier representation.
+
 \begin{figure}[h!]
   \centering
   \includegraphics{b-splines/exercise-two.eps}
