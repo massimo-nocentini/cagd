@@ -2,20 +2,14 @@
 \usepackage[utf8x]{inputenc} % codifica scrittura
 \usepackage[nochapters]{classicthesis} % nochapters
 
-%\usepackage{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage[square,numbers]{natbib}
 \usepackage{amsmath, amsthm, amssymb, amsfonts, tikz}
 \usetikzlibrary{snakes}
-% \newtheorem{definizione}{Definizione}
-% \newtheorem{lemma}{Lemma}
-% \newtheorem{teorema}{Teorema}
-% \newtheorem{proprieta}{Proprietà}
 \usepackage{titletoc}
 \usepackage{verbatim}
 \usepackage{hyperref}
 \usepackage{boxedminipage}
-% \usepackage{framed}
 
 \titlecontents{section}[3em]{}{\contentslabel{1em}}{}{\titlerule*[1.5pc]{.}\contentspage}
 \titlecontents{subsection}[6em]{}{\contentslabel{2em}}{}{\titlerule*[1.5pc]{.}\contentspage}
@@ -32,13 +26,17 @@
 
 
 \begin{abstract}
-  This document contains some exercises and collects work done during
+  This document contains some exercises and collects my work done during
   the CAGD course given by Prof. Alessandra Sestini and Prof. Costanza
   Conti at University of Florence.
 
-  The content is organized in sections, each one of them correspond to
-  a given set of exercises, the last one report the raw implementation
-  code written in Julia \cite{Julia}.
+  In particular, this document collect exercises requested by Prof.
+  Costanza Conti about Bezier and BSplines curves. We implement numerical
+  methods using Julia  language \cite{Julia} and everything (code for
+  solving exercises and \TeX sources of this document) is under
+  version control, available as open source Git repository
+  \footnote{Hosted on \url{http://github.com/massimo-nocentini/cagd}},
+  under \emph{MIT License}.
 \end{abstract}
 
 \tableofcontents
@@ -49,8 +47,7 @@
 
 \subsection{Curve from simple set of control points}
 In \autoref{fig:first-closed-curve} we report the very first Bezier
-curve obtained using our implementation reported in
-\autoref{sec:deCasteljau-code}. The curve is obtained using control
+curve obtained using our implementation. The curve is obtained using control
 points $(1,1), (3,4), (5,6),(7,8),(10,2),(1,1)$ in the given
 order. This plot was the first test for our implementation of code
 reported in Exercise 1 and requested in Exercise 2: it contains a
@@ -438,8 +435,8 @@ and no control point is repeated.
 As Exercise 1 requires, in \autoref{fig:bspline-exercise-one-clumped} we
 report five BSpline curves, each one of them drawn against the same control
 net. We modify for each curve its knots partition, formally for curves
-$\mathbf{c}_{1},\mathbf{c}_{2},\mathbf{c}_{3},\mathbf{c}_{4},\mathbf{c}_{5}$
-and $\mathbf{c}_{6}$ the following extended partitions are used:
+$\mathbf{c}_{1},\mathbf{c}_{2},\mathbf{c}_{3},\mathbf{c}_{4}$ and $\mathbf{c}_{5}$
+the following extended partitions are used:
 \begin{displaymath}
     \begin{split}
         \Delta_{1} &= \lbrace 0,0, \frac{1}{5}, \frac{2}{5},
@@ -619,17 +616,6 @@ and \autoref{fig:bspline-exercise-six-second}, respectively.
   \caption{A second B-Spline from a closed partition }
   \label{fig:bspline-exercise-six-second}
 \end{figure}
-
-
-\section{Code}
-
-\subsection{de Casteljau}
-\label{sec:deCasteljau-code}
-\verbatiminput{bezier-deCasteljau-curves/deCasteljau.jl}
-
-\subsection{Cox and de Boor}
-\label{sec:Cox-deBoor-code}
-\verbatiminput{b-splines/bspline.jl}
 
 \newpage
 
