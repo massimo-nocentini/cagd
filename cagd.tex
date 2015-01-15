@@ -509,6 +509,28 @@ knots $1,2$, toward Bezier representation.
 \end{figure}
 
 \subsection{Linearity near doubled control point with a clumped partition}
+In \autoref{fig:bspline-exercise-three} we plot curve required for Exercise 3:
+a quadratic curve ($order = 3$) with a doubled control point $\mathbf{V}_{3} =
+\mathbf{V}_{4} = (1,1)$ over an extended partition
+$\Delta = \lbrace 0,0,0, \frac{1}{4},\frac{1}{2},\frac{3}{4},
+1,1,1 \rbrace$, a clumped one with no repeated knots.
+
+Lets consider the subcurve $\mathbf{c}_{5}(t)$ for $t \in [t_{5}, t_{6}]$:
+\begin{displaymath}
+    \mathbf{c}_{5}(t) = \sum_{i=3}^{5}{\mathbf{V}_{i}N_{i,3}(t)}
+\end{displaymath}
+Since $\mathbf{V}_{4} = \mathbf{V}_{3}$, for $t \in [t_{5}, t_{6}]$,
+$\mathbf{c}_{5}(t)$ must lie on the convex hull $\mathbf{V}_{3}, \mathbf{V}_{4},
+\mathbf{V}_{5}$ and,  for $t \in [t_{4}, t_{5}]$, $\mathbf{c}_{5}(t)$ must lie
+on the convex hull $\mathbf{V}_{2}, \mathbf{V}_{3}, \mathbf{V}_{4}$, it does follow
+that $\mathbf{c}_{5}(t_{5})$ has to lie in their intersection, therefore vertex
+$\mathbf{V}_{4}$, interpolating it.
+
+Moreover, $\mathbf{c}_{5}(t)$ has two linear segment between
+$\mathbf{V}_{2}, \mathbf{V}_{3}$ and $\mathbf{V}_{4}, \mathbf{V}_{5}$,
+both of them join in $t_{4}, t_{6}$ with continuity $\mathcal{C}^{1}$.
+
+
 \begin{figure}[h!]
   \centering
   \includegraphics{b-splines/exercise-three.eps}
