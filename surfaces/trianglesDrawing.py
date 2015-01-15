@@ -16,20 +16,20 @@ def draw(*surfaces, figure_size_tuple=(15,15)):
         surface, triangles = surfaces
         surfaces = [(surface, triangles)]
 
-    fig = plt.figure() 
-    ax = fig.add_subplot(1, 1, 1, projection='3d') 
+    fig = plt.figure()
+    ax = fig.add_subplot(1, 1, 1, projection='3d')
 
     for surface, triangles in surfaces:
         x, y, z = surface[0,:],surface[1,:],surface[2,:]
-        ax.plot_trisurf(x, y, z, 
-                        triangles=triangles, cmap=plt.cm.Spectral, edgecolor='none')
+        ax.plot_trisurf(x, y, z,
+                        triangles=triangles, cmap=plt.cm.Spectral)#, edgecolor='none')
 
     return fig, ax
 
 
 def draw_repeated_degree_elevation(
     control_net, snapshots=None, degrees=None, formatting_string="Order {}:"):
-   
+
     order, control_net = control_net
 
     if snapshots:
@@ -57,7 +57,7 @@ def draw_repeated_degree_elevation(
                     print_handler(order)
                     d += 1
                     if d == len(degrees): break
-                
+
 
     def print_handler(order):
 
