@@ -579,6 +579,20 @@ knots partition is not simple, it contains a double knot.
 \end{figure}
 
 \subsection{Increasing clumped partitions for increasing occurrences of a control point}
+In Exercise 5 it is required to provide three extended knots partitions in
+order to draw cubic curves reported in \autoref{fig:bspline-exercise-five}.
+Each curve is defined against the ``same'' control net, having the middle vertex
+of the top row repeated one, two, three times respectively. Our choice of knots
+partitions, each clumped since interpolation of first and last control points
+is requested:
+\begin{displaymath}
+    \begin{split}
+        \Delta_{1} &= \lbrace 0,0,0,0,\frac{1}{2},1,1,1,1 \rbrace \\
+        \Delta_{2} &= \lbrace 0,0,0,0,\frac{1}{3},\frac{2}{3},1,1,1,1 \rbrace \\
+        \Delta_{3} &= \lbrace 0,0,0,0,\frac{1}{4},\frac{1}{2},\frac{3}{4},1,1,1,1 \rbrace \\
+    \end{split}
+\end{displaymath}
+
 
 \begin{figure}[h!]
   \centering
@@ -588,6 +602,10 @@ knots partition is not simple, it contains a double knot.
 \end{figure}
 
 \subsection{Two B-Splines from two closed partitions}
+In this last section we report two closed curves having $order = 4$ over
+two cyclic knots partitions, in \autoref{fig:bspline-exercise-six-first}
+and \autoref{fig:bspline-exercise-six-second}, respectively.
+
 \begin{figure}[h!]
   \centering
   \includegraphics{b-splines/exercise-six-first-closed.eps}
