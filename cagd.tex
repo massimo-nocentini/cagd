@@ -538,7 +538,39 @@ both of them join in $t_{4}, t_{6}$ with continuity $\mathcal{C}^{1}$.
   \label{fig:bspline-exercise-three}
 \end{figure}
 
-\subsection{Two clumped partitions, different \emph{continuity} vectors and same control polygon}
+\subsection{Two clumped partitions, different \emph{continuity} vectors
+    and same control polygon}
+In \autoref{fig:bspline-exercise-four} we report two curves required by Exercise 4.
+Both of them have $order = 4$ and a control net with a doubled point
+$\mathbf{V}_{3} = \mathbf{V}_{4}$, while the former (colored green)
+is over a knots partition
+$\Delta_{1} = \lbrace 0,0,0,0,\frac{1}{4}, \frac{3}{4}, 1,1,1,1 \rbrace$
+(having simple knots, no repeated one), the latter (colored blue) is over
+a knots partition
+$\Delta_{2} = \lbrace 0,0,0,0,\frac{1}{2}, \frac{1}{2}, 1,1,1,1 \rbrace$ (having
+knot $\frac{1}{2}$ doubled). Let define the following subcurves of the former:
+\begin{displaymath}
+    \begin{split}
+        \mathbf{c}_{4}(t) &= \sum_{i=1}^{4}{\mathbf{V}_{i}N_{i,4}(t)}, \quad
+            t \in [t_{4}, t_{5}] \\
+        \mathbf{c}_{5}(t) &= \sum_{i=2}^{5}{\mathbf{V}_{i}N_{i,4}(t)}, \quad
+            t \in [t_{5}, t_{6}] \\
+        \mathbf{c}_{6}(t) &= \sum_{i=3}^{6}{\mathbf{V}_{i}N_{i,4}(t)}, \quad
+            t \in [t_{6}, t_{7}] \\
+    \end{split}
+\end{displaymath}
+Now $\mathbf{c}_{5}^{\prime}(t_{5}) = \mathbf{c}_{4}^{\prime}(t_{5})$, so the
+curve interpolate a point on the segment with extrema $\mathbf{V}_{2}, \mathbf{V}_{3}$
+and it is tangent to the control net in $t_{5}$. On the other hand,
+$\mathbf{c}_{6}^{\prime}(t_{6}) = \mathbf{c}_{5}^{\prime}(t_{6})$, so the
+curve interpolate a point on the segment with extrema $\mathbf{V}_{4}, \mathbf{V}_{5}$
+and it is tangent to the control net in $t_{6}$.
+Finally, observe that the curve doesn't
+interpolate the doubled control point $\mathbf{V}_{3} = \mathbf{V}_{4}$.
+
+The previous argument doesn't apply to the second curve because its
+knots partition is not simple, it contains a double knot.
+
 \begin{figure}[h!]
   \centering
   \includegraphics{b-splines/exercise-four.eps}
@@ -547,6 +579,7 @@ both of them join in $t_{4}, t_{6}$ with continuity $\mathcal{C}^{1}$.
 \end{figure}
 
 \subsection{Increasing clumped partitions for increasing occurrences of a control point}
+
 \begin{figure}[h!]
   \centering
   \includegraphics{b-splines/exercise-five.eps}
