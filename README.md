@@ -12,7 +12,7 @@ tensor product and triangular Bezier patches*.
 We implement numerical methods usign two languages, *Julia* for curves part and
 *Python* for the surfaces part:
 * for the former we collect our results in a TeX document, a compiled
-    pdf can be found [here][pdf-curves]
+    pdf can be found [here][pdf_curves];
  which can be
     compiled directly from the root of this repository;
 * for the latter we collect our results in three *IPython notebooks*
@@ -25,3 +25,4 @@ We implement numerical methods usign two languages, *Julia* for curves part and
 [tp]: http://nbviewer.ipython.org/github/massimo-nocentini/cagd/blob/master/surfaces/Tensor%20Product%20Bezier%20Patches.ipynb?flush_cache=true
 [tri]: http://nbviewer.ipython.org/github/massimo-nocentini/cagd/blob/master/surfaces/Triangular%20Bezier%20Patches.ipynb?flush_cache=true
 
+[pdf_curves]: https://github.com/massimo-nocentini/cagd/blob/master/compiled-documents/cagd.pdf
