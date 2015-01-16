@@ -13,8 +13,6 @@ We implement numerical methods usign two languages, *Julia* for curves part and
 *Python* for the surfaces part:
 * for the former we collect our results in a TeX document, a compiled
     pdf can be found [here][pdf_curves];
- which can be
-    compiled directly from the root of this repository;
 * for the latter we collect our results in three *IPython notebooks*
     with the following links:
     * [de Boor recurrence for BSpline][deBoor]
