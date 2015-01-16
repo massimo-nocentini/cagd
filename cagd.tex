@@ -30,7 +30,7 @@
   the CAGD course given by Prof. Alessandra Sestini and Prof. Costanza
   Conti at University of Florence.
 
-  In particular, this document collect exercises requested by Prof.
+  In particular, here we collect exercises requested by Prof.
   Costanza Conti about Bezier and BSplines curves. We implement numerical
   methods using Julia  language \cite{Julia} and everything (code for
   solving exercises and \TeX sources of this document) is under
@@ -208,7 +208,7 @@ Hence four control points are $\{(1,0), (\frac{3}{4},0), (2,0),
   \label{fig:curve-from-parametric-spec}
 \end{figure}
 
-\subsection{Splitted curve on a given parameter $u$}
+\subsection{Splitted curve on a given parameter $\hat{t}$}
 As required in Exercise 4, in \autoref{fig:splitted-curve} we report
 the control polygon for the original curve in red, and two sets of
 control points with the same cardinality that, used together, build a
@@ -556,7 +556,8 @@ knot $\frac{1}{2}$ doubled). Let define the following subcurves of the former:
             t \in [t_{6}, t_{7}] \\
     \end{split}
 \end{displaymath}
-Now $\mathbf{c}_{5}^{\prime}(t_{5}) = \mathbf{c}_{4}^{\prime}(t_{5})$, so the
+As we saw during classes \cite{Conti}, $\mathbf{c}_{5}^{\prime}(t_{5}) =
+\mathbf{c}_{4}^{\prime}(t_{5})$ holds, so the
 curve interpolate a point on the segment with extrema $\mathbf{V}_{2}, \mathbf{V}_{3}$
 and it is tangent to the control net in $t_{5}$. On the other hand,
 $\mathbf{c}_{6}^{\prime}(t_{6}) = \mathbf{c}_{5}^{\prime}(t_{6})$, so the
@@ -626,6 +627,9 @@ and \autoref{fig:bspline-exercise-six-second}, respectively.
 
 \bibitem{Farin} Gerald Farin,
   \textit{Curves and surfaces for CAGD, Fifth Edition}
+
+\bibitem{Conti} Costanza Conti,
+    \emph{Lecture notes}, distributed during classes
 
 
 \end{thebibliography}
